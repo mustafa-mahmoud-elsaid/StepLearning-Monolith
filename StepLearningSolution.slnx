@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/" />
+  <Folder Name="/src/Modules/" />
+  <Folder Name="/src/Modules/Courses/" />
+  <Folder Name="/src/Modules/Enrollments/" />
+  <Folder Name="/src/Modules/Identity/" />
+  <Folder Name="/src/Modules/Payments/" />
+  <Folder Name="/src/Shared/" />
+</Solution>
