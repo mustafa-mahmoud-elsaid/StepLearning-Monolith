@@ -9,5 +9,7 @@
   <Folder Name="/src/Modules/Enrollments/" />
   <Folder Name="/src/Modules/Identity/" />
   <Folder Name="/src/Modules/Payments/" />
-  <Folder Name="/src/Shared/" />
+  <Folder Name="/src/Shared/">
+    <Project Path="StepLearning.Shared/StepLearning.Shared.csproj" Id="f6126f0c-0a4c-4851-9a18-a675d0663f17" />
+  </Folder>
 </Solution>
