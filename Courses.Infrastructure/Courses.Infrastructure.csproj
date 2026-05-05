@@ -12,7 +12,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Courses.Application\Courses.Application.csproj" />
-    <ProjectReference Include="..\Courses.Domain\Courses.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>
