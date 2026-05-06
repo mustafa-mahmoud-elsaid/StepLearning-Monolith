@@ -1,6 +1,6 @@
 ﻿namespace Courses.Domain.Entities;
 
-public class Section : BaseEntity
+public class Section : BaseEntity, IDisplayOrder
 {
     public string Title { get; set; } = string.Empty;
     public int DisplayOrder { get; set; }

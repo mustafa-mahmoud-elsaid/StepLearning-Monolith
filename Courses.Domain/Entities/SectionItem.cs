@@ -1,6 +1,6 @@
 ﻿namespace Courses.Domain.Entities;
 
-public abstract class SectionItem : BaseEntity
+public abstract class SectionItem : BaseEntity, IDisplayOrder
 {
     public string Title { get; set; } = string.Empty;
     public Guid SectionId { get; set; }

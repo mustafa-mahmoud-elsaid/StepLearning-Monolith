@@ -1,12 +1,15 @@
 ﻿using Courses.Application.RepositoriesContracts;
+using Courses.Domain;
 using Courses.Domain.Entities;
 using Courses.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace Courses.Infrastructure.Repositories;
 
-internal class SectionsRepository(CoursesDbContext dbContext) : ISectionsRepository
+internal sealed class SectionsRepository(CoursesDbContext dbContext) : ISectionsRepository
 {
+   
     public async Task<Guid> CreateSectionAsync(Section section, CancellationToken cancellationToken = default)
     {
         await dbContext.Sections.AddAsync(section, cancellationToken);
@@ -16,9 +19,30 @@ internal class SectionsRepository(CoursesDbContext dbContext) : ISectionsReposit
         return section.Id;
     }
 
-    public async Task<int> GetLastDisplayOrderAsync(Guid courseId)
+    public async Task<Guid> CreateVideoItemAsync(VideoItem videoItem, CancellationToken cancellationToken = default)
     {
-        var maxOrder = await dbContext.Sections.AsNoTracking().Where(s => s.CourseId == courseId).Select(s => (int?)s.DisplayOrder).MaxAsync();
+        await dbContext.SectionItems.AddAsync(videoItem, cancellationToken); 
+
+        await dbContext.SaveChangesAsync(cancellationToken);
+
+        return videoItem.Id;
+    }
+    public async Task<Guid> CreatePdfItemAsync(PdfItem pdfItem, CancellationToken cancellationToken = default)
+    {
+        await dbContext.SectionItems.AddAsync(pdfItem, cancellationToken);
+
+        await dbContext.SaveChangesAsync(cancellationToken);
+
+        return pdfItem.Id;
+    }
+
+    public async Task<int> GetLastDisplayOrderAsync<TEntity>(Expression<Func<TEntity, bool>> predicate) where TEntity : class, IDisplayOrder
+    {
+        var maxOrder = await dbContext.Set<TEntity>()
+            .AsNoTracking()
+            .Where(predicate)
+            .Select(x => (int?)x.DisplayOrder)
+            .MaxAsync();
 
         return maxOrder ?? 0;
     }

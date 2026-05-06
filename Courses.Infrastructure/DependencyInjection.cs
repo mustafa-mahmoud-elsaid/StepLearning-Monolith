@@ -19,6 +19,7 @@ public static class DependencyInjection
             });
         });
         services.AddScoped<ICoursesRepository, CoursesRepository>();
+        services.AddScoped<ISectionsRepository, SectionsRepository>();
         return services;
     }
 }

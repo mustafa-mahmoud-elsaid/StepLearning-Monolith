@@ -1,15 +1,16 @@
 ﻿using Courses.Application.RepositoriesContracts;
+using Courses.Application.Utilities;
 using Courses.Domain.Entities;
 using MediatR;
 using StepLearning.Shared.Result;
 
 namespace Courses.Application.Features.Create.Sections;
 
-public class CreateSectionCommandHandler : IRequestHandler<CreateSectionCommand, Result<Guid>>
+public class CreateSectionHandler : IRequestHandler<CreateSectionCommand, Result<Guid>>
 {
     private readonly ISectionsRepository _sectionsRepository;
 
-    public CreateSectionCommandHandler(ISectionsRepository sectionsRepository)
+    public CreateSectionHandler(ISectionsRepository sectionsRepository)
     {
         _sectionsRepository = sectionsRepository;
     }
@@ -18,7 +19,7 @@ public class CreateSectionCommandHandler : IRequestHandler<CreateSectionCommand,
         // TODO: check course id
 
 
-        var lastSectionOrder = await _sectionsRepository.GetLastDisplayOrderAsync(request.dto.CourseId)!;
+        var lastSectionOrder = await _sectionsRepository.GetLastDisplayOrderAsync<Section>(s => s.Id == request.dto.CourseId)!;
 
         var section = new Section
         {
@@ -27,10 +28,7 @@ public class CreateSectionCommandHandler : IRequestHandler<CreateSectionCommand,
             CourseId = request.dto.CourseId
         };
 
-        if (lastSectionOrder == -1)
-            section.DisplayOrder = 10;
-        else
-            section.DisplayOrder = ((lastSectionOrder / 10) + 1) * 10; // created sections should be match the pattern: 10, 20, 30, ...
+        section.DisplayOrder = Helper.GetRightOrder(lastSectionOrder);
 
         var sectionId = await _sectionsRepository.CreateSectionAsync(section, cancellationToken);
 

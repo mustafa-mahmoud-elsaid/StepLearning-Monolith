@@ -4,7 +4,7 @@ using Courses.Infrastructure.Data;
 
 namespace Courses.Infrastructure.Repositories;
 
-public class CoursesRepository : ICoursesRepository
+internal sealed class CoursesRepository : ICoursesRepository
 {
     private readonly CoursesDbContext _dbContext;
 
