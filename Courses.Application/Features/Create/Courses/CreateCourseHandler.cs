@@ -17,14 +17,8 @@ public class CreateCourseHandler : IRequestHandler<CreateCourseCommand, Result<G
     {
         // TODO: check instructor id
 
-        var course = new Course
-        {
-            Id = Guid.NewGuid(),
-            Title = request.dto.Title,
-            InstructorId = request.dto.InstructorId,
-            Description = request.dto.Description,
-            IsPublished = false,
-        };
+        var course = Course.Create(request.dto.Title, request.dto.Description, request.dto.InstructorId);
+
         var courseId = await _coursesRepository.CreateCourseAsync(course, cancellationToken);
 
         return Result<Guid>.Success(courseId);
