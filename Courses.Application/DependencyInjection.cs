@@ -1,16 +1,25 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Courses.Application.Utilities.Behaviors;
+using FluentValidation;
+using MediatR;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Courses.Application;
 
-internal sealed class MediatrAssembly { }
 public static class DependencyInjection
 {
     public static IServiceCollection AddCoursesApplication(this IServiceCollection services)
     {
         services.AddMediatR(cfg =>
         {
-            cfg.RegisterServicesFromAssemblies(typeof(MediatrAssembly).Assembly);
+            cfg.RegisterServicesFromAssemblies(typeof(DependencyInjection).Assembly);
         });
+
+        services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly);
+
+        services.AddTransient(
+            typeof(IPipelineBehavior<,>),
+            typeof(ValidationBehavior<,>)
+            );
         return services;
     }
 }
