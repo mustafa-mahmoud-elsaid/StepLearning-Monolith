@@ -1,4 +1,4 @@
-﻿using System.Runtime.InteropServices;
+using System.Runtime.InteropServices;
 
 namespace Courses.Domain.Entities;
 
@@ -10,6 +10,8 @@ public class Course : BaseEntity
     public string? ThumbnailUrl { get; private set; }
     public bool IsPublished { get; private set; }
     public Guid InstructorId { get; private set; }
+    // TODO: Add Slug (string) property — auto-generated from Title, unique, used for SEO-friendly URLs.
+    // TODO: Add Ratings navigation property and AverageRating computed/denormalized field.
     private readonly List<Section> _sections = new();
     public IReadOnlyCollection<Section> Sections => _sections.AsReadOnly();
     public static Course Create(string title, string? description, Guid instructorId)
