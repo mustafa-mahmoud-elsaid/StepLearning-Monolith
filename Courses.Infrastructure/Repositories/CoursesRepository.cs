@@ -115,4 +115,36 @@ internal sealed class CoursesRepository : ICoursesRepository
             TotalCount = totalCount
         };
     }
+
+    public async Task<PaginatedResult<InstructorCourseDto>> GetInstructorCoursesAsync(Guid instructorId, int pageNumber, int pageSize, CancellationToken cancellationToken)
+    {
+        var query = _dbContext.Courses
+            .Where(c => c.InstructorId == instructorId && !c.IsDeleted);
+
+        var totalCount = await query.CountAsync(cancellationToken);
+
+        var courses = await query
+            .OrderByDescending(c => c.CreatedAt)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .Select(c => new InstructorCourseDto(
+                Id: c.Id,
+                Title: c.Title,
+                Description: c.Description,
+                Thumbnail: c.ThumbnailUrl,
+                Price: c.Price,
+                IsPublished: c.IsPublished,
+                CreatedAt: c.CreatedAt,
+                LastUpdated: c.UpdatedAt
+            ))
+            .ToListAsync(cancellationToken);
+
+        return new PaginatedResult<InstructorCourseDto>
+        {
+            Data = courses,
+            PageNumber = pageNumber,
+            PageSize = pageSize,
+            TotalCount = totalCount
+        };
+    }
 }
