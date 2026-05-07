@@ -1,4 +1,6 @@
-﻿using Courses.Infrastructure.Data;
+﻿using Courses.Application.RepositoriesContracts;
+using Courses.Infrastructure.Data;
+using Courses.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,7 +18,8 @@ public static class DependencyInjection
                 sql.EnableRetryOnFailure(2);
             });
         });
-
+        services.AddScoped<ICoursesRepository, CoursesRepository>();
+        services.AddScoped<ISectionsRepository, SectionsRepository>();
         return services;
     }
 }
