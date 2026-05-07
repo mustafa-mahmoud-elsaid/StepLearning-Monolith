@@ -188,4 +188,17 @@ internal sealed class CoursesRepository : ICoursesRepository
             TotalCount = totalCount
         };
     }
+
+    public async Task<Course?> GetCourseWithSectionsAsync(Guid id, CancellationToken cancellationToken)
+    {
+        return await _dbContext.Courses
+            .Include(c => c.Sections)
+                .ThenInclude(s => s.SectionItems)
+            .FirstOrDefaultAsync(c => c.Id == id && !c.IsDeleted, cancellationToken);
+    }
+
+    public async Task SaveChangesAsync(CancellationToken cancellationToken)
+    {
+        await _dbContext.SaveChangesAsync(cancellationToken);
+    }
 }

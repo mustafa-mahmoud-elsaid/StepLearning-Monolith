@@ -26,4 +26,25 @@ public class Course : BaseEntity
             Price = 0m,
         };
     }
+
+    public void Publish()
+    {
+        if (IsPublished)
+            throw new InvalidOperationException("Course is already published.");
+
+        var hasPublishedContent = _sections.Any(s => s.IsPublished && s.SectionItems.Any());
+
+        if (!hasPublishedContent)
+            throw new InvalidOperationException("Course must have at least one published section with items before publishing.");
+
+        IsPublished = true;
+    }
+
+    public void Unpublish()
+    {
+        if (!IsPublished)
+            throw new InvalidOperationException("Course is not published.");
+
+        IsPublished = false;
+    }
 }
