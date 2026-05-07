@@ -9,4 +9,10 @@ public static class Helper
         else
             return ((lastOrder / 10) + 1) * 10; // should be match the pattern: 10, 20, 30, ...
     }
+    public static bool BeValidUrl(string url)
+    {
+        return Uri.TryCreate(url, UriKind.Absolute, out Uri? uriResult)
+            && (uriResult.Scheme == Uri.UriSchemeHttp ||
+            uriResult.Scheme == Uri.UriSchemeHttps);
+    }
 }
