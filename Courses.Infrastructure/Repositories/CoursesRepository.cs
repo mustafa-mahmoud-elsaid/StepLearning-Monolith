@@ -147,4 +147,45 @@ internal sealed class CoursesRepository : ICoursesRepository
             TotalCount = totalCount
         };
     }
+
+    public async Task<PaginatedResult<CourseCardDto>> SearchCoursesAsync(
+        string? title, decimal? minPrice, decimal? maxPrice,
+        int pageNumber, int pageSize, CancellationToken cancellationToken)
+    {
+        var query = _dbContext.Courses
+            .Where(c => c.IsPublished && !c.IsDeleted);
+
+        if (!string.IsNullOrWhiteSpace(title))
+            query = query.Where(c => EF.Functions.Like(c.Title, $"%{title}%"));
+
+        if (minPrice.HasValue)
+            query = query.Where(c => c.Price >= minPrice.Value);
+
+        if (maxPrice.HasValue)
+            query = query.Where(c => c.Price <= maxPrice.Value);
+
+        var totalCount = await query.CountAsync(cancellationToken);
+
+        var courses = await query
+            .OrderByDescending(c => c.UpdatedAt)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .Select(c => new CourseCardDto(
+                Id: c.Id,
+                Title: c.Title,
+                Description: c.Description,
+                Thumbnail: c.ThumbnailUrl,
+                Price: c.Price,
+                LastUpdated: c.UpdatedAt
+            ))
+            .ToListAsync(cancellationToken);
+
+        return new PaginatedResult<CourseCardDto>
+        {
+            Data = courses,
+            PageNumber = pageNumber,
+            PageSize = pageSize,
+            TotalCount = totalCount
+        };
+    }
 }
