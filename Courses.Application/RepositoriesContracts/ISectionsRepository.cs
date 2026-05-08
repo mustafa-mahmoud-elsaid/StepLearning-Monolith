@@ -1,4 +1,4 @@
-﻿using Courses.Domain;
+using Courses.Domain;
 using Courses.Domain.Entities;
 using System.Linq.Expressions;
 
@@ -17,4 +17,8 @@ public interface ISectionsRepository
 
     Task<Guid> CreateVideoItemAsync(VideoItem videoItem, CancellationToken cancellationToken = default);
     Task<Guid> CreatePdfItemAsync(PdfItem pdfItem, CancellationToken cancellationToken = default);
+    Task<IList<Section>> GetSectionsByCourseIdAsync(Guid courseId, CancellationToken cancellationToken = default);
+    Task<IList<SectionItem>> GetSectionItemsBySectionIdAsync(Guid sectionId, CancellationToken cancellationToken = default);
+    Task SaveChangesAsync(CancellationToken cancellationToken = default);
 }
+

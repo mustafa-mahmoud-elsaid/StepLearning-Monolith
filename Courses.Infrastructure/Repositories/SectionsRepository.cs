@@ -1,4 +1,4 @@
-﻿using Courses.Application.RepositoriesContracts;
+using Courses.Application.RepositoriesContracts;
 using Courses.Domain;
 using Courses.Domain.Entities;
 using Courses.Infrastructure.Data;
@@ -45,5 +45,26 @@ internal sealed class SectionsRepository(CoursesDbContext dbContext) : ISections
             .MaxAsync();
 
         return maxOrder ?? 0;
+    }
+
+    public async Task<IList<Section>> GetSectionsByCourseIdAsync(Guid courseId, CancellationToken cancellationToken)
+    {
+        return await dbContext.Sections
+            .Where(s => s.CourseId == courseId)
+            .OrderBy(s => s.DisplayOrder)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<IList<SectionItem>> GetSectionItemsBySectionIdAsync(Guid sectionId, CancellationToken cancellationToken)
+    {
+        return await dbContext.SectionItems
+            .Where(i => i.SectionId == sectionId)
+            .OrderBy(i => i.DisplayOrder)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task SaveChangesAsync(CancellationToken cancellationToken)
+    {
+        await dbContext.SaveChangesAsync(cancellationToken);
     }
 }
