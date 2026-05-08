@@ -1,4 +1,4 @@
-﻿using System.Runtime.InteropServices;
+using System.Runtime.InteropServices;
 
 namespace Courses.Domain.Entities;
 
@@ -10,6 +10,8 @@ public class Course : BaseEntity
     public string? ThumbnailUrl { get; private set; }
     public bool IsPublished { get; private set; }
     public Guid InstructorId { get; private set; }
+    // TODO: Add Slug (string) property — auto-generated from Title, unique, used for SEO-friendly URLs.
+    // TODO: Add Ratings navigation property and AverageRating computed/denormalized field.
     private readonly List<Section> _sections = new();
     public IReadOnlyCollection<Section> Sections => _sections.AsReadOnly();
     public static Course Create(string title, string? description, Guid instructorId)
@@ -23,5 +25,26 @@ public class Course : BaseEntity
             IsPublished = false,
             Price = 0m,
         };
+    }
+
+    public void Publish()
+    {
+        if (IsPublished)
+            throw new InvalidOperationException("Course is already published.");
+
+        var hasPublishedContent = _sections.Any(s => s.IsPublished && s.SectionItems.Any());
+
+        if (!hasPublishedContent)
+            throw new InvalidOperationException("Course must have at least one published section with items before publishing.");
+
+        IsPublished = true;
+    }
+
+    public void Unpublish()
+    {
+        if (!IsPublished)
+            throw new InvalidOperationException("Course is not published.");
+
+        IsPublished = false;
     }
 }
