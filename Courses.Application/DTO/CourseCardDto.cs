@@ -7,5 +7,5 @@ public record CourseCardDto(
     string Title,
     string? Description,
     string? Thumbnail,
-    decimal Price,
+    decimal? Price,
     DateTimeOffset LastUpdated);
