@@ -47,4 +47,25 @@ public class Course : BaseEntity
 
         IsPublished = false;
     }
+
+    public void Update(string? title, string? description, decimal? price)
+    {
+        if (title is not null)
+        {
+            if (string.IsNullOrWhiteSpace(title))
+                throw new ArgumentException("Title cannot be empty.", nameof(title));
+
+            Title = title;
+        }
+
+        if (price.HasValue)
+        {
+            if (price.Value < 0)
+                throw new ArgumentException("Price cannot be negative.", nameof(price));
+
+            Price = price.Value;
+        }
+
+        Description = description ?? Description;
+    }
 }

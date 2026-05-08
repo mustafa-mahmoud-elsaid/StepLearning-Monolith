@@ -197,6 +197,12 @@ internal sealed class CoursesRepository : ICoursesRepository
             .FirstOrDefaultAsync(c => c.Id == id && !c.IsDeleted, cancellationToken);
     }
 
+    public async Task<Course?> GetCourseByIdEntityAsync(Guid id, CancellationToken cancellationToken)
+    {
+        return await _dbContext.Courses
+            .FirstOrDefaultAsync(c => c.Id == id && !c.IsDeleted, cancellationToken);
+    }
+
     public async Task SaveChangesAsync(CancellationToken cancellationToken)
     {
         await _dbContext.SaveChangesAsync(cancellationToken);

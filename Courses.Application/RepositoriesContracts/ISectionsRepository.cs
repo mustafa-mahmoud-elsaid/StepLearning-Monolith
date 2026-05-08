@@ -19,6 +19,8 @@ public interface ISectionsRepository
     Task<Guid> CreatePdfItemAsync(PdfItem pdfItem, CancellationToken cancellationToken = default);
     Task<IList<Section>> GetSectionsByCourseIdAsync(Guid courseId, CancellationToken cancellationToken = default);
     Task<IList<SectionItem>> GetSectionItemsBySectionIdAsync(Guid sectionId, CancellationToken cancellationToken = default);
+    Task<Section?> GetSectionByIdAsync(Guid sectionId, CancellationToken cancellationToken = default);
+    Task<SectionItem?> GetSectionItemByIdAsync(Guid sectionItemId, CancellationToken cancellationToken = default);
     Task SaveChangesAsync(CancellationToken cancellationToken = default);
 }
 
