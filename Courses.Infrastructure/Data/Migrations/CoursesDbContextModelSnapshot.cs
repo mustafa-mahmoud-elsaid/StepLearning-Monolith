@@ -44,7 +44,7 @@ namespace Courses.Infrastructure.Data.Migrations
                     b.Property<bool>("IsPublished")
                         .HasColumnType("bit");
 
-                    b.Property<decimal>("Price")
+                    b.Property<decimal?>("Price")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<byte[]>("RowVersion")

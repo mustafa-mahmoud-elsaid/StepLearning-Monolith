@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Courses.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(CoursesDbContext))]
-    [Migration("20260508193231_InitialCreate")]
+    [Migration("20260508195935_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -47,7 +47,7 @@ namespace Courses.Infrastructure.Data.Migrations
                     b.Property<bool>("IsPublished")
                         .HasColumnType("bit");
 
-                    b.Property<decimal>("Price")
+                    b.Property<decimal?>("Price")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<byte[]>("RowVersion")
