@@ -63,6 +63,18 @@ internal sealed class SectionsRepository(CoursesDbContext dbContext) : ISections
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<Section?> GetSectionByIdAsync(Guid sectionId, CancellationToken cancellationToken)
+    {
+        return await dbContext.Sections
+            .FirstOrDefaultAsync(s => s.Id == sectionId, cancellationToken);
+    }
+
+    public async Task<SectionItem?> GetSectionItemByIdAsync(Guid sectionItemId, CancellationToken cancellationToken)
+    {
+        return await dbContext.SectionItems
+            .FirstOrDefaultAsync(i => i.Id == sectionItemId, cancellationToken);
+    }
+
     public async Task SaveChangesAsync(CancellationToken cancellationToken)
     {
         await dbContext.SaveChangesAsync(cancellationToken);
