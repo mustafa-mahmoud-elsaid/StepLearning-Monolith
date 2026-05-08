@@ -12,8 +12,7 @@ internal class CourseConfig : IEntityTypeConfiguration<Course>
             .IsRowVersion();
 
         builder.Property(c => c.Price)
-            .HasColumnType("decimal(18,2)")
-            .IsRequired();
+            .HasColumnType("decimal(18,2)");
 
         builder.Property(c => c.Title)
             .HasMaxLength(250)
