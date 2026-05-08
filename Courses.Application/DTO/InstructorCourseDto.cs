@@ -5,7 +5,7 @@ public record InstructorCourseDto(
     string Title,
     string? Description,
     string? Thumbnail,
-    decimal Price,
+    decimal? Price,
     bool IsPublished,
     DateTimeOffset CreatedAt,
     DateTimeOffset LastUpdated);

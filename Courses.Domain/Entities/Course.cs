@@ -6,7 +6,7 @@ public class Course : BaseEntity
 {
     public string Title { get; private set; } = string.Empty;
     public string? Description { get; private set; }
-    public decimal Price { get; private set; }
+    public decimal? Price { get; private set; }
     public string? ThumbnailUrl { get; private set; }
     public bool IsPublished { get; private set; }
     public Guid InstructorId { get; private set; }
@@ -23,7 +23,7 @@ public class Course : BaseEntity
             InstructorId = instructorId,
             Description = description,
             IsPublished = false,
-            Price = 0m,
+            Price = null,
         };
     }
 
@@ -31,6 +31,9 @@ public class Course : BaseEntity
     {
         if (IsPublished)
             throw new InvalidOperationException("Course is already published.");
+
+        if (!Price.HasValue)
+            throw new InvalidOperationException("Course must have a price set before publishing.");
 
         var hasPublishedContent = _sections.Any(s => s.IsPublished && s.SectionItems.Any());
 
@@ -63,7 +66,7 @@ public class Course : BaseEntity
             if (price.Value < 0)
                 throw new ArgumentException("Price cannot be negative.", nameof(price));
 
-            Price = price.Value;
+            Price = price;
         }
 
         Description = description ?? Description;
