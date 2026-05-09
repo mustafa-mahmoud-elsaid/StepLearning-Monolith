@@ -1,4 +1,11 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using FluentValidation;
+using Identity.Application.Behaviors;
+using Identity.Application.Infrastructure.Data;
+using Identity.Application.Infrastructure.Repositories;
+using Identity.Application.RepositoryInterfaces;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Identity.Application;
@@ -11,8 +18,27 @@ public static class DependencyInjection
     /// <param name="services"></param>
     /// <param name="configuration"></param>
     /// <returns></returns>
-    public static IServiceCollection AddIdentityApplictaion(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddIdentityApplication(this IServiceCollection services, IConfiguration configuration)
     {
+
+        services.AddDbContext<UsersDbContext>(options =>
+        {
+            options.UseSqlServer(configuration.GetConnectionString("StepLearning.UsersDb"),
+                sql => 
+                    sql.EnableRetryOnFailure(2)
+                    );
+        });
+
+        services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+
+        services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(DependencyInjection).Assembly));
+
+        services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly);
+
+        services.AddTransient(
+            typeof(IPipelineBehavior<,>),
+            typeof(ValidationBehavior<,>)
+            );
         return services;
     }
 }

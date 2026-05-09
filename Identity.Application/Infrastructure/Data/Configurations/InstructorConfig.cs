@@ -12,11 +12,11 @@ internal class InstructorConfig : IEntityTypeConfiguration<Instructor>
             .HasMaxLength(500);
 
         builder.Property(s => s.FirstName)
-            .HasMaxLength(250)
+            .HasMaxLength(50)
             .IsRequired();
 
         builder.Property(s => s.LastName)
-            .HasMaxLength(250)
+            .HasMaxLength(50)
             .IsRequired();
     }
 }
