@@ -23,7 +23,6 @@
   <ItemGroup>
     <Folder Include="Features\Login\" />
     <Folder Include="Features\Register\" />
-    <Folder Include="Infrastructure\Data\" />
     <Folder Include="Infrastructure\JWT\" />
   </ItemGroup>
 

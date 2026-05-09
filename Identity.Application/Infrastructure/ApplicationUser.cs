@@ -2,6 +2,6 @@
 
 namespace Identity.Application.Infrastructure;
 
-internal class ApplicationUser : IdentityUser<Guid>
+public class ApplicationUser : IdentityUser<Guid>
 {
 }
