@@ -21,7 +21,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Features\Register\Student\" />
     <Folder Include="Infrastructure\JWT\" />
   </ItemGroup>
 
