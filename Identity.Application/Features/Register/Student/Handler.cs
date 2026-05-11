@@ -1,4 +1,4 @@
-﻿using Identity.Application.Domain.DTO;
+using Identity.Application.Domain.DTO;
 using Identity.Application.Infrastructure;
 using Identity.Application.Infrastructure.JWT;
 using Identity.Application.RepositoryInterfaces;
@@ -35,10 +35,12 @@ public sealed class Handler(
             if (!result.Succeeded)
                 return Result<LoginResponse>.Failure("Failed to register the user");
 
+            await _userManager.AddToRoleAsync(appUser, Domain.AppRoles.Student);
+
             var student = Domain.Entities.Student
                 .Create(dto.FullName, appUser.Id, dto.DateOfBirth, dto.ProfilePictureUrl);
 
-            // add instructor
+            // add student
             await _repository.AddAsync(student, cancellationToken);
 
             await _repository.SaveChangesAsync(cancellationToken);

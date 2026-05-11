@@ -1,4 +1,4 @@
-﻿using Identity.Application.Domain.DTO;
+using Identity.Application.Domain.DTO;
 using Identity.Application.Infrastructure;
 using Identity.Application.Infrastructure.JWT;
 using Identity.Application.RepositoryInterfaces;
@@ -37,6 +37,8 @@ public class Handler : IRequestHandler<InstructorRegisterCommand, Result<LoginRe
 
             if (!result.Succeeded)
                 return Result<LoginResponse>.Failure("Failed to register the user");
+
+            await _userManager.AddToRoleAsync(appUser, Domain.AppRoles.Instructor);
 
             var instructor = Domain.Entities.Instructor
                 .Create(dto.FirstName, dto.LastName, appUser.Id, dto.ProfilePictureUrl, dto.Bio);
