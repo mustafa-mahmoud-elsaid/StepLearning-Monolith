@@ -1,4 +1,4 @@
-﻿namespace Identity.Application.Domain.Entities;
+namespace Identity.Application.Domain.Entities;
 
 public class RefreshToken
 {
@@ -25,5 +25,15 @@ public class RefreshToken
             ExpiresAt = expireAt,
             UserId = userId
         };
+    }
+
+    public bool IsValid => !IsRevoked && ExpiresAt > DateTime.UtcNow;
+
+    public void Revoke()
+    {
+        if (IsRevoked)
+            throw new InvalidOperationException("Token is already revoked.");
+
+        IsRevoked = true;
     }
 }

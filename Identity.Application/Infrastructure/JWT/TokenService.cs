@@ -1,4 +1,4 @@
-﻿using Identity.Application.Domain.Entities;
+using Identity.Application.Domain.Entities;
 using Identity.Application.RepositoryInterfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
@@ -14,10 +14,10 @@ namespace Identity.Application.Infrastructure.JWT;
 internal class TokenService : ITokenService
 {
     private readonly UserManager<ApplicationUser> _userManager;
-    private readonly IGenericRepository<RefreshToken> _refTokenRepository;
+    private readonly IRefreshTokenRepository _refTokenRepository;
     private readonly IConfiguration _configuration;
 
-    public TokenService(UserManager<ApplicationUser> userManager, IGenericRepository<RefreshToken> refTokenRepository, IConfiguration configuration)
+    public TokenService(UserManager<ApplicationUser> userManager, IRefreshTokenRepository refTokenRepository, IConfiguration configuration)
     {
         _userManager = userManager;
         _refTokenRepository = refTokenRepository;

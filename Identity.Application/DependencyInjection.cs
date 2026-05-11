@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+using FluentValidation;
 using Identity.Application.Behaviors;
 using Identity.Application.Infrastructure;
 using Identity.Application.Infrastructure.Data;
@@ -35,6 +35,7 @@ public static class DependencyInjection
         services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
         services.AddScoped<ITokenService, TokenService>();
+        services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(DependencyInjection).Assembly));
 
