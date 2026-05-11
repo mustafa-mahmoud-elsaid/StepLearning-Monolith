@@ -3,6 +3,9 @@ using Courses.Infrastructure;
 using Host.Api.Middleware;
 using Identity.Application;
 using Identity.Application.Infrastructure.Data;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +28,30 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
+// ── JWT Configurations ───────────────────────────────────────────
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters()
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+
+
+        ValidIssuer = builder.Configuration["JWT:Issuer"],
+        ValidAudience = builder.Configuration["JWT:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"]!)),
+        ClockSkew = TimeSpan.Zero
+    };
+});
+
+
 var app = builder.Build();
 
 // ── Middleware Pipeline ──────────────────────────────────────────
@@ -39,8 +66,10 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
+
 app.UseAuthentication();
 app.UseAuthorization();
+
 app.MapControllers();
 
 // ── Seed Data ────────────────────────────────────────────────────
