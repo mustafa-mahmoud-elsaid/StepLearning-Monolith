@@ -1,6 +1,8 @@
 using Courses.Application;
 using Courses.Infrastructure;
 using Host.Api.Middleware;
+using Identity.Application;
+using Identity.Application.Infrastructure.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Each module owns its DI setup. The Host just calls them.
 builder.Services.AddCoursesApplication();
 builder.Services.AddCoursesInfrastructure(builder.Configuration);
+builder.Services.AddIdentityApplication(builder.Configuration);
 
 // ── API Infrastructure ───────────────────────────────────────────
 builder.Services.AddControllers();
@@ -36,6 +39,11 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapControllers();
+
+// ── Seed Data ────────────────────────────────────────────────────
+await IdentitySeeder.SeedRolesAsync(app.Services);
 
 app.Run();
