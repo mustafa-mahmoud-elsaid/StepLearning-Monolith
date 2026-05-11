@@ -1,5 +1,6 @@
 using Identity.Application.Domain.DTO;
 using Identity.Application.Features.Login;
+using Identity.Application.Features.Logout;
 using Identity.Application.Features.RefreshToken;
 using Identity.Application.Features.Register.Instructor;
 using Identity.Application.Features.Register.Student;
@@ -45,6 +46,13 @@ public class AuthController : ControllerBase
     {
         var result = await _mediator.Send(new RefreshTokenCommand(request.RefreshToken), ct);
         return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
+    }
+
+    [HttpPost("logout")]
+    public async Task<IActionResult> Logout([FromBody] RefreshTokenRequest request, CancellationToken ct)
+    {
+        var result = await _mediator.Send(new LogoutCommand(request.RefreshToken), ct);
+        return result.IsSuccess ? NoContent() : BadRequest(result.Error);
     }
 }
 
