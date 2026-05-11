@@ -1,6 +1,11 @@
 using Courses.Application;
 using Courses.Infrastructure;
 using Host.Api.Middleware;
+using Identity.Application;
+using Identity.Application.Infrastructure.Data;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,19 +13,44 @@ var builder = WebApplication.CreateBuilder(args);
 // Each module owns its DI setup. The Host just calls them.
 builder.Services.AddCoursesApplication();
 builder.Services.AddCoursesInfrastructure(builder.Configuration);
+builder.Services.AddIdentityApplication(builder.Configuration);
 
 // ── API Infrastructure ───────────────────────────────────────────
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
-    options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+    options.SwaggerDoc("v1", new()
     {
         Title = "StepLearning API",
         Version = "v1",
         Description = "StepLearning Modular Monolith API"
     });
 });
+
+// ── JWT Configurations ───────────────────────────────────────────
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters()
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+
+
+        ValidIssuer = builder.Configuration["JWT:Issuer"],
+        ValidAudience = builder.Configuration["JWT:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"]!)),
+        ClockSkew = TimeSpan.Zero
+    };
+});
+
 
 var app = builder.Build();
 
@@ -36,6 +66,13 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
 app.MapControllers();
+
+// ── Seed Data ────────────────────────────────────────────────────
+await IdentitySeeder.SeedRolesAsync(app.Services);
 
 app.Run();
