@@ -1,5 +1,6 @@
 ﻿using Identity.Application.Domain.DTO;
 using Identity.Application.Infrastructure;
+using Identity.Application.Infrastructure.JWT;
 using Identity.Application.RepositoryInterfaces;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
@@ -9,11 +10,13 @@ namespace Identity.Application.Features.Register.Student;
 
 public sealed class Handler(
     IGenericRepository<Domain.Entities.Student> repository,
-    UserManager<ApplicationUser> userManager) 
+    UserManager<ApplicationUser> userManager,
+    ITokenService tokenService) 
     : IRequestHandler<StudentRegisterCommand, Result<LoginResponse>>
 {
     private readonly IGenericRepository<Domain.Entities.Student> _repository = repository;
     private readonly UserManager<ApplicationUser> _userManager = userManager;
+    private readonly ITokenService _tokenService = tokenService;
 
     public async Task<Result<LoginResponse>> Handle(StudentRegisterCommand request, CancellationToken cancellationToken)
     {
@@ -40,7 +43,13 @@ public sealed class Handler(
 
             await _repository.SaveChangesAsync(cancellationToken);
 
-            return Result<LoginResponse>.Success(new("token", "refreshToken"));
+            var jwtToken = await _tokenService.GenerateJWTToken(appUser);
+            var refTokenResult = await _tokenService.GenerateRefreshToken(appUser, cancellationToken);
+
+            if (!refTokenResult.IsSuccess)
+                return Result<LoginResponse>.Failure(refTokenResult.Error!);
+
+            return Result<LoginResponse>.Success(new(jwtToken, refTokenResult.Value!));
 
         }
         catch (InvalidOperationException ex)

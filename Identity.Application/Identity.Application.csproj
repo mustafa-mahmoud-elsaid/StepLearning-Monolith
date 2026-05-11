@@ -21,10 +21,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Infrastructure\JWT\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\StepLearning.Shared\StepLearning.Shared.csproj" />
   </ItemGroup>
 

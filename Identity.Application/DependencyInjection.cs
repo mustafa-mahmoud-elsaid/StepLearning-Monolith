@@ -1,9 +1,12 @@
 ﻿using FluentValidation;
 using Identity.Application.Behaviors;
+using Identity.Application.Infrastructure;
 using Identity.Application.Infrastructure.Data;
+using Identity.Application.Infrastructure.JWT;
 using Identity.Application.Infrastructure.Repositories;
 using Identity.Application.RepositoryInterfaces;
 using MediatR;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -31,6 +34,8 @@ public static class DependencyInjection
 
         services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
+        services.AddScoped<ITokenService, TokenService>();
+
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(DependencyInjection).Assembly));
 
         services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly);
@@ -39,6 +44,8 @@ public static class DependencyInjection
             typeof(IPipelineBehavior<,>),
             typeof(ValidationBehavior<,>)
             );
+
+        services.AddIdentity<ApplicationUser, IdentityRole<Guid>>().AddEntityFrameworkStores<UsersDbContext>();
         return services;
     }
 }

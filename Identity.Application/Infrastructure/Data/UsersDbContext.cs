@@ -10,6 +10,7 @@ public class UsersDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Gu
 
     public DbSet<Student> Students { get; set; }
     public DbSet<Instructor> Instructors { get; set; }
+    public DbSet<RefreshToken> RefreshTokens { get; set; }
     public UsersDbContext(DbContextOptions<UsersDbContext> options) : base(options)
     {
     }

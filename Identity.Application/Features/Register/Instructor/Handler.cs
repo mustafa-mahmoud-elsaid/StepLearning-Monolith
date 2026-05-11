@@ -1,6 +1,6 @@
 ﻿using Identity.Application.Domain.DTO;
-using Identity.Application.Domain.Entities;
 using Identity.Application.Infrastructure;
+using Identity.Application.Infrastructure.JWT;
 using Identity.Application.RepositoryInterfaces;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
@@ -12,11 +12,14 @@ public class Handler : IRequestHandler<InstructorRegisterCommand, Result<LoginRe
 {
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IGenericRepository<Domain.Entities.Instructor> _repository;
+    private readonly ITokenService _tokenService;
 
-    public Handler(UserManager<ApplicationUser> userManager, IGenericRepository<Domain.Entities.Instructor> repository)
+    public Handler(UserManager<ApplicationUser> userManager, IGenericRepository<Domain.Entities.Instructor> repository,
+        ITokenService tokenService)
     {
         _userManager = userManager;
         _repository = repository;
+        _tokenService = tokenService;
     }
     public async Task<Result<LoginResponse>> Handle(InstructorRegisterCommand request, CancellationToken cancellationToken)
     {
@@ -24,6 +27,7 @@ public class Handler : IRequestHandler<InstructorRegisterCommand, Result<LoginRe
 
         if (user is not null)
             return Result<LoginResponse>.Failure("Email already exists");
+
         var dto = request.dto;
 
         try
@@ -42,7 +46,14 @@ public class Handler : IRequestHandler<InstructorRegisterCommand, Result<LoginRe
 
             await _repository.SaveChangesAsync(cancellationToken);
 
-            return Result<LoginResponse>.Success(new("token", "refreshToken"));
+            var jwtToken = await _tokenService.GenerateJWTToken(appUser);
+
+            var refTokenResult = await _tokenService.GenerateRefreshToken(appUser, cancellationToken);
+
+            if (!refTokenResult.IsSuccess)
+                return Result<LoginResponse>.Failure(refTokenResult.Error!);
+
+            return Result<LoginResponse>.Success(new(jwtToken, refTokenResult.Value!));
 
         }
         catch (InvalidOperationException ex)
