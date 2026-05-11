@@ -22,6 +22,7 @@ public class Student
         {
             Id = Guid.NewGuid(),
             UserId = userId,
+            FullName = fullName,
             DateOfBirth = dateOfBirth,
             ProfilePictureUrl = profilePictureUrl
         };
