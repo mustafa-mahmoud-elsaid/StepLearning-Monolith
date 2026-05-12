@@ -49,6 +49,7 @@ public static class DependencyInjection
             );
 
         services.AddScoped<IInstructorService, InstructorService>();
+        services.AddScoped<IStudentService, StudentService>();
 
         services.AddIdentity<ApplicationUser, IdentityRole<Guid>>().AddEntityFrameworkStores<UsersDbContext>();
         return services;

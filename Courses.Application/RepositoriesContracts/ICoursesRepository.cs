@@ -16,4 +16,5 @@ public interface ICoursesRepository
     Task<Course?> GetCourseByIdEntityAsync(Guid id, CancellationToken cancellationToken = default);
     Task SaveChangesAsync(CancellationToken cancellationToken = default);
     Task<Guid> GetInstructorId(Guid courseId,  CancellationToken cancellationToken = default);
+    Task<bool> Exists(Guid courseId, CancellationToken ct = default);
 }

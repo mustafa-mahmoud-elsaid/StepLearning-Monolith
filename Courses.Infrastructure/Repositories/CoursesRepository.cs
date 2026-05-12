@@ -219,4 +219,9 @@ internal sealed class CoursesRepository : ICoursesRepository
             .Select(c => c.InstructorId)
             .FirstOrDefaultAsync(cancellationToken);
     }
+
+    public async Task<bool> Exists(Guid courseId, CancellationToken ct = default) 
+        => await _dbContext.Courses.AnyAsync(c => c.Id == courseId &&
+        c.IsPublished &&
+        !c.IsDeleted, ct);
 }
