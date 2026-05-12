@@ -1,21 +1,20 @@
 ﻿using Courses.Application.RepositoriesContracts;
 using Courses.Domain.Entities;
 using MediatR;
+using StepLearning.Shared.Abstraction;
 using StepLearning.Shared.Result;
 
 namespace Courses.Application.Features.Create.Courses;
 
-public class CreateCourseHandler : IRequestHandler<CreateCourseCommand, Result<Guid>>
+public class CreateCourseHandler(ICoursesRepository coursesRepository, IInstructorService instructorService) : IRequestHandler<CreateCourseCommand, Result<Guid>>
 {
-    private readonly ICoursesRepository _coursesRepository;
+    private readonly ICoursesRepository _coursesRepository = coursesRepository;
+    private readonly IInstructorService _instructorService = instructorService;
 
-    public CreateCourseHandler(ICoursesRepository coursesRepository)
-    {
-        _coursesRepository = coursesRepository;
-    }
     public async Task<Result<Guid>> Handle(CreateCourseCommand request, CancellationToken cancellationToken)
     {
-        // TODO: check instructor id
+        if (await _instructorService.Exists(request.dto.InstructorId, cancellationToken))
+            return Result<Guid>.Failure("Can not create the course, no intructor with this id");
 
         var course = Course.Create(request.dto.Title, request.dto.Description, request.dto.InstructorId);
 

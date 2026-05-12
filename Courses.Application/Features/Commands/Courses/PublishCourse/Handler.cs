@@ -20,7 +20,8 @@ public class Handler : IRequestHandler<PublishCourseCommand, Result>
         if (course is null)
             return Result.Failure("Course not found.");
 
-        // TODO: Validate that request.InstructorId matches course.InstructorId (ownership check).
+        if(request.InstructorId != course.InstructorId)
+            return Result.Failure("intructor not owns this course.");
 
         try
         {
