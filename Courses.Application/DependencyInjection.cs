@@ -1,7 +1,7 @@
-﻿using Courses.Application.Utilities.Behaviors;
-using FluentValidation;
+﻿using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
+using StepLearning.Shared;
 
 namespace Courses.Application;
 

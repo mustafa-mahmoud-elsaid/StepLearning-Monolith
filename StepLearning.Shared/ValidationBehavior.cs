@@ -1,9 +1,9 @@
 ﻿using FluentValidation;
 using MediatR;
 
-namespace Courses.Application.Utilities.Behaviors;
+namespace StepLearning.Shared;
 
-internal class ValidationBehavior<TRequest, TResponse>
+public class ValidationBehavior<TRequest, TResponse>
     : IPipelineBehavior<TRequest, TResponse>
     where TRequest : notnull
 {
@@ -27,7 +27,7 @@ internal class ValidationBehavior<TRequest, TResponse>
                 .Where(f => f is not null)
                 .ToList();
 
-            if(failures.Any())
+            if (failures.Any())
             {
                 throw new ValidationException(failures);
             }
