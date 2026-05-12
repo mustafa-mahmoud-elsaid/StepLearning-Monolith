@@ -4,12 +4,15 @@ using Identity.Application.Infrastructure;
 using Identity.Application.Infrastructure.Data;
 using Identity.Application.Infrastructure.JWT;
 using Identity.Application.Infrastructure.Repositories;
+using Identity.Application.Infrastructure.Services;
 using Identity.Application.RepositoryInterfaces;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using StepLearning.Shared.Abstraction;
+
 namespace Identity.Application;
 
 public static class DependencyInjection
@@ -44,6 +47,8 @@ public static class DependencyInjection
             typeof(IPipelineBehavior<,>),
             typeof(ValidationBehavior<,>)
             );
+
+        services.AddScoped<IInstructorService, InstructorService>();
 
         services.AddIdentity<ApplicationUser, IdentityRole<Guid>>().AddEntityFrameworkStores<UsersDbContext>();
         return services;

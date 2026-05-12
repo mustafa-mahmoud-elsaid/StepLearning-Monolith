@@ -192,6 +192,7 @@ internal sealed class CoursesRepository : ICoursesRepository
     public async Task<Course?> GetCourseWithSectionsAsync(Guid id, CancellationToken cancellationToken)
     {
         return await _dbContext.Courses
+            .AsNoTracking()
             .Include(c => c.Sections)
                 .ThenInclude(s => s.SectionItems)
             .FirstOrDefaultAsync(c => c.Id == id && !c.IsDeleted, cancellationToken);
@@ -206,5 +207,16 @@ internal sealed class CoursesRepository : ICoursesRepository
     public async Task SaveChangesAsync(CancellationToken cancellationToken)
     {
         await _dbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task<Guid> GetInstructorId(Guid courseId, CancellationToken cancellationToken = default)
+    {
+        if (courseId == Guid.Empty)
+            throw new InvalidOperationException("course id can not be empty");
+        return await _dbContext.Courses
+            .AsNoTracking()
+            .Where(c => c.Id == courseId)
+            .Select(c => c.InstructorId)
+            .FirstOrDefaultAsync(cancellationToken);
     }
 }

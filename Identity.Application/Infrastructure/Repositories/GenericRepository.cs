@@ -1,5 +1,7 @@
 ﻿using Identity.Application.Infrastructure.Data;
 using Identity.Application.RepositoryInterfaces;
+using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace Identity.Application.Infrastructure.Repositories;
 
@@ -14,6 +16,11 @@ internal class GenericRepository<T> : IGenericRepository<T> where T : class
     public async Task AddAsync(T entity, CancellationToken cancellationToken = default)
     {
         await _dbContext.AddAsync(entity, cancellationToken);
+    }
+
+    public async Task<bool> Exists(Expression<Func<T, bool>> predicate, CancellationToken ct = default)
+    {
+        return await _dbContext.Set<T>().AnyAsync(predicate, ct);
     }
 
     public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

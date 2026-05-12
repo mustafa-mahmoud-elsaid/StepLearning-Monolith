@@ -15,4 +15,5 @@ public interface ICoursesRepository
     Task<Course?> GetCourseWithSectionsAsync(Guid id, CancellationToken cancellationToken = default);
     Task<Course?> GetCourseByIdEntityAsync(Guid id, CancellationToken cancellationToken = default);
     Task SaveChangesAsync(CancellationToken cancellationToken = default);
+    Task<Guid> GetInstructorId(Guid courseId,  CancellationToken cancellationToken = default);
 }
