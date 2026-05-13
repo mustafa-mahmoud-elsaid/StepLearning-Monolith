@@ -8,6 +8,8 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using Identity.Application.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace Identity.Application.Infrastructure.JWT;
 
@@ -16,12 +18,14 @@ internal class TokenService : ITokenService
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IRefreshTokenRepository _refTokenRepository;
     private readonly IConfiguration _configuration;
+    private readonly UsersDbContext _dbContext;
 
-    public TokenService(UserManager<ApplicationUser> userManager, IRefreshTokenRepository refTokenRepository, IConfiguration configuration)
+    public TokenService(UserManager<ApplicationUser> userManager, IRefreshTokenRepository refTokenRepository, IConfiguration configuration, UsersDbContext dbContext)
     {
         _userManager = userManager;
         _refTokenRepository = refTokenRepository;
         _configuration = configuration;
+        _dbContext = dbContext;
     }
     public async Task<string> GenerateJWTToken(ApplicationUser user)
     {
@@ -33,13 +37,26 @@ internal class TokenService : ITokenService
         var roles = await _userManager.GetRolesAsync(user);
         var rolesClaims = roles.Select(r => new Claim(ClaimTypes.Role, r)).ToList();
 
-        var claims = new[]
+        var claims = new List<Claim>
         {
             new Claim(JwtRegisteredClaimNames.Sub, user.UserName??""),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             new Claim(JwtRegisteredClaimNames.Email, user.Email?? ""),
-        }.Union(userClaims)
-        .Union(rolesClaims);
+        };
+        claims.AddRange(userClaims);
+        claims.AddRange(rolesClaims);
+
+        var student = await _dbContext.Students.FirstOrDefaultAsync(s => s.UserId == user.Id);
+        if (student != null)
+        {
+            claims.Add(new Claim("studentId", student.Id.ToString()));
+        }
+
+        var instructor = await _dbContext.Instructors.FirstOrDefaultAsync(i => i.UserId == user.Id);
+        if (instructor != null)
+        {
+            claims.Add(new Claim("instructorId", instructor.Id.ToString()));
+        }
 
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Key"] ?? throw new InvalidOperationException("No key configured")));
 
