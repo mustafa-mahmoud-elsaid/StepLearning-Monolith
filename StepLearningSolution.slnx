@@ -12,7 +12,10 @@
   <Folder Name="/src/Modules/Identity/">
     <Project Path="Identity.Application/Identity.Application.csproj" Id="d637935e-8b9b-49f8-b29b-02136c99df8c" />
   </Folder>
-  <Folder Name="/src/Modules/Payments/" />
+  <Folder Name="/src/Modules/Payments/">
+    <Project Path="Payment.Application/Payment.Application.csproj" />
+    <Project Path="Payment.Infrastructure/Payment.Infrastructure.csproj" />
+  </Folder>
   <Folder Name="/src/Shared/">
     <Project Path="StepLearning.Shared/StepLearning.Shared.csproj" Id="f6126f0c-0a4c-4851-9a18-a675d0663f17" />
   </Folder>
