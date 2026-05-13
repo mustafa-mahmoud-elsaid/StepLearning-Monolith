@@ -5,6 +5,7 @@ using Identity.Application.Features.RefreshToken;
 using Identity.Application.Features.Register.Instructor;
 using Identity.Application.Features.Register.Student;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Host.Api.Controllers.Modules.Identity;
@@ -49,6 +50,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("logout")]
+    [Authorize]
     public async Task<IActionResult> Logout([FromBody] RefreshTokenRequest request, CancellationToken ct)
     {
         var result = await _mediator.Send(new LogoutCommand(request.RefreshToken), ct);
