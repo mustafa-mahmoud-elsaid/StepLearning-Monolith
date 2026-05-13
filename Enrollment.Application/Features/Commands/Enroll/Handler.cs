@@ -26,8 +26,10 @@ internal sealed class Handler(
         if(!validStudent)
             return Result.Failure("Failed to enroll, student not exists");
 
-        // TODO: is already enrolled (prevent duplication)
+        var isEnrolled =  await enrollmentRepository.IsEnrolled(dto.StudentId, dto.CourseId, cancellationToken);
 
+        if (isEnrolled)
+            return Result.Failure("Student is already enrolled");
 
         // TODO:check if the user payment succeeded
 
