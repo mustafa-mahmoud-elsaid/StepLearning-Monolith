@@ -1,5 +1,6 @@
 using Courses.Application;
 using Courses.Infrastructure;
+using Enrollment.Application;
 using Host.Api.Middleware;
 using Identity.Application;
 using Identity.Application.Infrastructure.Data;
@@ -14,6 +15,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCoursesApplication();
 builder.Services.AddCoursesInfrastructure(builder.Configuration);
 builder.Services.AddIdentityApplication(builder.Configuration);
+builder.Services.AddEnrollmentApplication(builder.Configuration);
 
 // ── API Infrastructure ───────────────────────────────────────────
 builder.Services.AddControllers();
