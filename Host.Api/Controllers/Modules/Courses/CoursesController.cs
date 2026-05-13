@@ -10,6 +10,7 @@ using Courses.Application.Features.Query.Courses.SearchCourses;
 using Courses.Application.Features.Query.Courses.GetCourseCards;
 using Courses.Application.Features.Query.Courses.GetStudentCourses;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Host.Api.Controllers.Modules.Courses;
@@ -35,8 +36,12 @@ public class CoursesController : ControllerBase
     }
 
     [HttpGet("{id:guid}/details")]
-    public async Task<IActionResult> GetDetails(Guid id, [FromQuery] Guid studentId, CancellationToken ct)
+    [Authorize(Roles = "Student")]
+    public async Task<IActionResult> GetDetails(Guid id, CancellationToken ct)
     {
+        if (!Guid.TryParse(User.FindFirst("studentId")?.Value, out var studentId))
+            return Unauthorized("Student ID not found in token.");
+
         var result = await _mediator.Send(new GetCourseDetailsQuery(id, studentId), ct);
         return result.IsSuccess ? Ok(result.Value) : NotFound(result.Error);
     }
@@ -61,16 +66,24 @@ public class CoursesController : ControllerBase
         return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
     }
 
-    [HttpGet("instructor/{instructorId:guid}")]
-    public async Task<IActionResult> GetInstructorCourses(Guid instructorId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, CancellationToken ct = default)
+    [HttpGet("instructor")]
+    [Authorize(Roles = "Instructor")]
+    public async Task<IActionResult> GetInstructorCourses([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, CancellationToken ct = default)
     {
+        if (!Guid.TryParse(User.FindFirst("instructorId")?.Value, out var instructorId))
+            return Unauthorized("Instructor ID not found in token.");
+
         var result = await _mediator.Send(new GetInstructorCoursesQuery(instructorId, pageNumber, pageSize), ct);
         return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
     }
 
-    [HttpGet("student/{studentId:guid}")]
-    public async Task<IActionResult> GetStudentCourses(Guid studentId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, CancellationToken ct = default)
+    [HttpGet("student")]
+    [Authorize(Roles = "Student")]
+    public async Task<IActionResult> GetStudentCourses([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, CancellationToken ct = default)
     {
+        if (!Guid.TryParse(User.FindFirst("studentId")?.Value, out var studentId))
+            return Unauthorized("Student ID not found in token.");
+
         var result = await _mediator.Send(new GetStudentCoursesQuery(studentId, pageNumber, pageSize), ct);
         return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
     }
@@ -78,13 +91,19 @@ public class CoursesController : ControllerBase
     // ── Commands ─────────────────────────────────────────────────
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] CourseCreateDto dto, CancellationToken ct)
+    [Authorize(Roles = "Instructor")]
+    public async Task<IActionResult> Create([FromBody] CourseCreateRequest request, CancellationToken ct)
     {
+        if (!Guid.TryParse(User.FindFirst("instructorId")?.Value, out var instructorId))
+            return Unauthorized("Instructor ID not found in token.");
+
+        var dto = new CourseCreateDto(instructorId, request.Title, request.Description);
         var result = await _mediator.Send(new CreateCourseCommand(dto), ct);
         return result.IsSuccess ? CreatedAtAction(nameof(GetPreview), new { id = result.Value }, result.Value) : BadRequest(result.Error);
     }
 
     [HttpPatch("{id:guid}")]
+    [Authorize(Roles = "Instructor")]
     public async Task<IActionResult> Update(Guid id, [FromBody] CourseUpdateDto dto, CancellationToken ct)
     {
         var result = await _mediator.Send(new UpdateCourseCommand(id, dto), ct);
@@ -92,16 +111,23 @@ public class CoursesController : ControllerBase
     }
 
     [HttpPost("{id:guid}/publish")]
-    public async Task<IActionResult> Publish(Guid id, [FromQuery] Guid instructorId, CancellationToken ct)
+    [Authorize(Roles = "Instructor")]
+    public async Task<IActionResult> Publish(Guid id, CancellationToken ct)
     {
+        if (!Guid.TryParse(User.FindFirst("instructorId")?.Value, out var instructorId))
+            return Unauthorized("Instructor ID not found in token.");
+
         var result = await _mediator.Send(new PublishCourseCommand(id, instructorId), ct);
         return result.IsSuccess ? NoContent() : BadRequest(result.Error);
     }
 
     [HttpDelete("{id:guid}")]
+    [Authorize(Roles = "Instructor")]
     public async Task<IActionResult> Delete(Guid id, CancellationToken ct)
     {
         var result = await _mediator.Send(new DeleteCourseCommand(id), ct);
         return result.IsSuccess ? NoContent() : BadRequest(result.Error);
     }
 }
+
+public record CourseCreateRequest(string Title, string? Description);

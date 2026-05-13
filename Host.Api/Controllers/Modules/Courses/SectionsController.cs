@@ -5,12 +5,14 @@ using Courses.Application.Features.Commands.Sections.UpdateSection;
 using Courses.Application.Features.Commands.Sections.UpdateSectionItem;
 using Courses.Application.Features.Create.Sections;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Host.Api.Controllers.Modules.Courses;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize(Roles = "Instructor")]
 public class SectionsController : ControllerBase
 {
     private readonly IMediator _mediator;
