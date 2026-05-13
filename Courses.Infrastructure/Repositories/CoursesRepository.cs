@@ -28,6 +28,7 @@ internal sealed class CoursesRepository : ICoursesRepository
     public async Task<CoursePreviewDto?> GetCoursePreviewAsync(Guid id, CancellationToken cancellationToken)
     {
         return await _dbContext.Courses
+            .AsNoTracking()
             .Where(c => c.Id == id && c.IsPublished)
             .Select(c => new CoursePreviewDto(
                 Id: c.Id,
@@ -56,6 +57,7 @@ internal sealed class CoursesRepository : ICoursesRepository
     public async Task<CourseDetailsDto?> GetCourseDetailsAsync(Guid id, CancellationToken cancellationToken)
     {
         return await _dbContext.Courses
+            .AsNoTracking()
             .Where(c => c.Id == id && c.IsPublished)
             .Select(c => new CourseDetailsDto(
                 Id: c.Id,
@@ -88,7 +90,7 @@ internal sealed class CoursesRepository : ICoursesRepository
 
     public async Task<PaginatedResult<CourseCardDto>> GetCourseCardsAsync(int pageNumber, int pageSize, CancellationToken cancellationToken)
     {
-        var query = _dbContext.Courses
+        var query = _dbContext.Courses.AsNoTracking()
             .Where(c => c.IsPublished && !c.IsDeleted);
 
         var totalCount = await query.CountAsync(cancellationToken);
@@ -118,7 +120,7 @@ internal sealed class CoursesRepository : ICoursesRepository
 
     public async Task<PaginatedResult<InstructorCourseDto>> GetInstructorCoursesAsync(Guid instructorId, int pageNumber, int pageSize, CancellationToken cancellationToken)
     {
-        var query = _dbContext.Courses
+        var query = _dbContext.Courses.AsNoTracking()
             .Where(c => c.InstructorId == instructorId && !c.IsDeleted);
 
         var totalCount = await query.CountAsync(cancellationToken);
@@ -152,7 +154,7 @@ internal sealed class CoursesRepository : ICoursesRepository
         string? title, decimal? minPrice, decimal? maxPrice,
         int pageNumber, int pageSize, CancellationToken cancellationToken)
     {
-        var query = _dbContext.Courses
+        var query = _dbContext.Courses.AsNoTracking()
             .Where(c => c.IsPublished && !c.IsDeleted);
 
         if (!string.IsNullOrWhiteSpace(title))
@@ -193,6 +195,7 @@ internal sealed class CoursesRepository : ICoursesRepository
     {
         return await _dbContext.Courses
             .AsNoTracking()
+            .AsSplitQuery()
             .Include(c => c.Sections)
                 .ThenInclude(s => s.SectionItems)
             .FirstOrDefaultAsync(c => c.Id == id && !c.IsDeleted, cancellationToken);
@@ -213,10 +216,61 @@ internal sealed class CoursesRepository : ICoursesRepository
     {
         if (courseId == Guid.Empty)
             throw new InvalidOperationException("course id can not be empty");
+
         return await _dbContext.Courses
             .AsNoTracking()
             .Where(c => c.Id == courseId)
             .Select(c => c.InstructorId)
             .FirstOrDefaultAsync(cancellationToken);
+    }
+
+    public async Task<bool> Exists(Guid courseId, CancellationToken ct = default) 
+        => await _dbContext.Courses.AnyAsync(c => c.Id == courseId &&
+        c.IsPublished &&
+        !c.IsDeleted, ct);
+
+    public async Task<PaginatedResult<CourseCardDto>> GetStudentCoursesAsync(IEnumerable<Guid> coursesIds, int pageNumber = 1, int pageSize = 10, CancellationToken cancellationToken = default)
+    {
+        if (coursesIds is null || !coursesIds.Any())
+            throw new InvalidOperationException();
+
+        var query = _dbContext.Courses
+                .AsNoTracking()
+                .Where(c => coursesIds.Contains(c.Id) && c.IsPublished && !c.IsDeleted);
+
+        var totalCount = await query.CountAsync(cancellationToken);
+
+        if (totalCount == 0)
+            return new ()
+            {
+                TotalCount = totalCount,
+                Data = [],
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+            };
+
+        var courses = await query
+            .Skip((pageNumber -1 )* pageSize)
+            .Take(pageSize)
+            .Select(c => new CourseCardDto
+            (
+                Id: c.Id,
+                Title: c.Title,
+                Description: c.Description,
+                Thumbnail: c.ThumbnailUrl,
+                Price: c.Price,
+                LastUpdated: c.UpdatedAt
+            )).ToListAsync(cancellationToken);
+
+        var paginatedResult = new PaginatedResult<CourseCardDto>
+        {
+            TotalCount = totalCount,
+            Data = courses,
+            PageNumber = pageNumber,
+            PageSize = pageSize,
+        };
+
+        return paginatedResult;
+
     }
 }

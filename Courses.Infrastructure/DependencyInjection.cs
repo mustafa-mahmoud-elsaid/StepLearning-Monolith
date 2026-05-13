@@ -1,9 +1,11 @@
 ﻿using Courses.Application.RepositoriesContracts;
 using Courses.Infrastructure.Data;
 using Courses.Infrastructure.Repositories;
+using Courses.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using StepLearning.Shared.Abstraction;
 
 namespace Courses.Infrastructure;
 
@@ -20,6 +22,7 @@ public static class DependencyInjection
         });
         services.AddScoped<ICoursesRepository, CoursesRepository>();
         services.AddScoped<ISectionsRepository, SectionsRepository>();
+        services.AddScoped<ICourseService, CourseService>();
         return services;
     }
 }

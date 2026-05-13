@@ -3,6 +3,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Courses.Application\Courses.Application.csproj" />
     <ProjectReference Include="..\Courses.Infrastructure\Courses.Infrastructure.csproj" />
+    <ProjectReference Include="..\Enrollment.Application\Enrollment.Application.csproj" />
     <ProjectReference Include="..\Identity.Application\Identity.Application.csproj" />
     <ProjectReference Include="..\StepLearning.Shared\StepLearning.Shared.csproj" />
   </ItemGroup>

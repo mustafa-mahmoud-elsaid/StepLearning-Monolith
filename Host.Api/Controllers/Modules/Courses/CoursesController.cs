@@ -8,6 +8,7 @@ using Courses.Application.Features.Query.Courses.GetCoursePreview;
 using Courses.Application.Features.Query.Courses.GetInstructorCourses;
 using Courses.Application.Features.Query.Courses.SearchCourses;
 using Courses.Application.Features.Query.Courses.GetCourseCards;
+using Courses.Application.Features.Query.Courses.GetStudentCourses;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -64,6 +65,13 @@ public class CoursesController : ControllerBase
     public async Task<IActionResult> GetInstructorCourses(Guid instructorId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, CancellationToken ct = default)
     {
         var result = await _mediator.Send(new GetInstructorCoursesQuery(instructorId, pageNumber, pageSize), ct);
+        return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
+    }
+
+    [HttpGet("student/{studentId:guid}")]
+    public async Task<IActionResult> GetStudentCourses(Guid studentId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, CancellationToken ct = default)
+    {
+        var result = await _mediator.Send(new GetStudentCoursesQuery(studentId, pageNumber, pageSize), ct);
         return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
     }
 
