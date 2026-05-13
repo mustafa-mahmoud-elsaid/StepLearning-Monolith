@@ -16,5 +16,6 @@ public interface ICoursesRepository
     Task<Course?> GetCourseByIdEntityAsync(Guid id, CancellationToken cancellationToken = default);
     Task SaveChangesAsync(CancellationToken cancellationToken = default);
     Task<Guid> GetInstructorId(Guid courseId,  CancellationToken cancellationToken = default);
+    Task<PaginatedResult<CourseCardDto>> GetStudentCoursesAsync(IEnumerable<Guid> coursesIds, int pageNumber = 1, int pageSize = 10, CancellationToken cancellationToken = default);
     Task<bool> Exists(Guid courseId, CancellationToken ct = default);
 }

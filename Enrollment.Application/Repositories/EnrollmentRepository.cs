@@ -1,4 +1,4 @@
-﻿
+
 using Enrollment.Application.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -24,5 +24,14 @@ internal class EnrollmentRepository : IEnrollmentRepository
             .AnyAsync(e => e.CourseId == courseId &&
             e.StudentId == studentId &&
             (e.Status == Domain.Enums.EnrollmentStatus.Active || e.Status == Domain.Enums.EnrollmentStatus.Completed), ct);
+    }
+
+    public async Task<IEnumerable<Guid>> GetStudentCourses(Guid studentId, CancellationToken ct = default)
+    {
+        return await _dbContext.Enrollments
+            .AsNoTracking()
+            .Where(e => e.StudentId == studentId && (e.Status == Domain.Enums.EnrollmentStatus.Active || e.Status == Domain.Enums.EnrollmentStatus.Completed))
+            .Select(e => e.CourseId)
+            .ToListAsync(ct);
     }
 }

@@ -19,8 +19,6 @@ public class Handler : IRequestHandler<GetCourseDetailsQuery, Result<CourseDetai
 
     public async Task<Result<CourseDetailsDto>> Handle(GetCourseDetailsQuery request, CancellationToken cancellationToken)
     {
-        // TODO: Validate that the student (request.StudentId) is enrolled in the course before returning details.
-
         var isEnrolled = await _enrollmentService.IsEnrolled(request.StudentId, request.CourseId, cancellationToken);
 
         if (!isEnrolled)

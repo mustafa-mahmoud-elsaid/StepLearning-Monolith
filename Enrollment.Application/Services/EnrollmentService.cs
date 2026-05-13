@@ -1,4 +1,4 @@
-﻿using Enrollment.Application.Repositories;
+using Enrollment.Application.Repositories;
 using StepLearning.Shared.Abstraction;
 
 namespace Enrollment.Application.Services;
@@ -11,5 +11,13 @@ internal class EnrollmentService(IEnrollmentRepository enrollmentRepository) : I
             return false;
 
         return await enrollmentRepository.IsEnrolled(studentId, courseId, ct);
+    }
+
+    public async Task<IEnumerable<Guid>> GetStudentCourses(Guid studentId, CancellationToken ct = default)
+    {
+        if (studentId == Guid.Empty)
+            return [];
+
+        return await enrollmentRepository.GetStudentCourses(studentId, ct);
     }
 }

@@ -228,4 +228,49 @@ internal sealed class CoursesRepository : ICoursesRepository
         => await _dbContext.Courses.AnyAsync(c => c.Id == courseId &&
         c.IsPublished &&
         !c.IsDeleted, ct);
+
+    public async Task<PaginatedResult<CourseCardDto>> GetStudentCoursesAsync(IEnumerable<Guid> coursesIds, int pageNumber = 1, int pageSize = 10, CancellationToken cancellationToken = default)
+    {
+        if (coursesIds is null || !coursesIds.Any())
+            throw new InvalidOperationException();
+
+        var query = _dbContext.Courses
+                .AsNoTracking()
+                .Where(c => coursesIds.Contains(c.Id) && c.IsPublished && !c.IsDeleted);
+
+        var totalCount = await query.CountAsync(cancellationToken);
+
+        if (totalCount == 0)
+            return new ()
+            {
+                TotalCount = totalCount,
+                Data = [],
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+            };
+
+        var courses = await query
+            .Skip((pageNumber -1 )* pageSize)
+            .Take(pageSize)
+            .Select(c => new CourseCardDto
+            (
+                Id: c.Id,
+                Title: c.Title,
+                Description: c.Description,
+                Thumbnail: c.ThumbnailUrl,
+                Price: c.Price,
+                LastUpdated: c.UpdatedAt
+            )).ToListAsync(cancellationToken);
+
+        var paginatedResult = new PaginatedResult<CourseCardDto>
+        {
+            TotalCount = totalCount,
+            Data = courses,
+            PageNumber = pageNumber,
+            PageSize = pageSize,
+        };
+
+        return paginatedResult;
+
+    }
 }
