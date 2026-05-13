@@ -16,6 +16,9 @@ public sealed class EnrollmentDbContext : DbContext
         {
             optins.Property(e => e.Status).HasConversion<string>();
 
+            optins.Property(e => e.PaymentId)
+                .IsRequired();
+
             optins.HasIndex(e => new { e.StudentId, e.CourseId })
             .IsUnique();
         });

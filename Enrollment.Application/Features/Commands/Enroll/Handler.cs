@@ -37,7 +37,7 @@ internal sealed class Handler(
         Domain.Entities.Enrollment enrollment;
         try
         {
-            enrollment = Domain.Entities.Enrollment.Create(dto.StudentId, dto.CourseId, dto.Status);
+            enrollment = Domain.Entities.Enrollment.Create(dto.StudentId, dto.CourseId, dto.PaymentId, dto.Status);
         }
         catch (InvalidOperationException ex)
         {
