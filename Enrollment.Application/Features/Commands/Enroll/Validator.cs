@@ -14,6 +14,10 @@ internal class Validator : AbstractValidator<EnrollStudentCommand>
             .NotEmpty()
             .WithMessage("Student Id must not be empty");
 
+        RuleFor(e => e.dto.PaymentId)
+            .NotEmpty()
+            .WithMessage("Payment Id must not be empty");
+
         RuleFor(e => e.dto.Status)
             .NotNull()
             .IsInEnum();

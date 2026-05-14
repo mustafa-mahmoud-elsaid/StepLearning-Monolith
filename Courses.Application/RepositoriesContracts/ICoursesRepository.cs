@@ -18,4 +18,5 @@ public interface ICoursesRepository
     Task<Guid> GetInstructorId(Guid courseId,  CancellationToken cancellationToken = default);
     Task<PaginatedResult<CourseCardDto>> GetStudentCoursesAsync(IEnumerable<Guid> coursesIds, int pageNumber = 1, int pageSize = 10, CancellationToken cancellationToken = default);
     Task<bool> Exists(Guid courseId, CancellationToken ct = default);
+    Task<decimal?> GetCoursePriceAsync(Guid courseId, CancellationToken ct = default);
 }
