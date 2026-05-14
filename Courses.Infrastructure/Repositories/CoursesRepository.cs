@@ -229,6 +229,15 @@ internal sealed class CoursesRepository : ICoursesRepository
         c.IsPublished &&
         !c.IsDeleted, ct);
 
+    public async Task<decimal?> GetCoursePriceAsync(Guid courseId, CancellationToken ct = default)
+    {
+        return await _dbContext.Courses
+            .AsNoTracking()
+            .Where(c => c.Id == courseId && c.IsPublished && !c.IsDeleted)
+            .Select(c => c.Price)
+            .FirstOrDefaultAsync(ct);
+    }
+
     public async Task<PaginatedResult<CourseCardDto>> GetStudentCoursesAsync(IEnumerable<Guid> coursesIds, int pageNumber = 1, int pageSize = 10, CancellationToken cancellationToken = default)
     {
         if (coursesIds is null || !coursesIds.Any())

@@ -6,6 +6,8 @@ using Identity.Application;
 using Identity.Application.Infrastructure.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Payment.Application;
+using Payment.Infrastructure;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,6 +18,8 @@ builder.Services.AddCoursesApplication();
 builder.Services.AddCoursesInfrastructure(builder.Configuration);
 builder.Services.AddIdentityApplication(builder.Configuration);
 builder.Services.AddEnrollmentApplication(builder.Configuration);
+builder.Services.AddPaymentApplication();
+builder.Services.AddPaymentInfrastructure(builder.Configuration);
 
 // ── API Infrastructure ───────────────────────────────────────────
 builder.Services.AddControllers();
