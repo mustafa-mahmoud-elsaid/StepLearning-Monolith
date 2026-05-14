@@ -11,8 +11,7 @@ namespace Payment.Application.Features.Checkout;
 internal sealed class Handler(
     ICourseService courseService,
     IStudentService studentService,
-    IPaymentRepository paymentRepository,
-    IPublishEndpoint publishEndpoint) : IRequestHandler<CheckoutCommand, Result<Guid>>
+    IPaymentRepository paymentRepository) : IRequestHandler<CheckoutCommand, Result<Guid>>
 {
     public async Task<Result<Guid>> Handle(CheckoutCommand request, CancellationToken cancellationToken)
     {
@@ -48,8 +47,7 @@ internal sealed class Handler(
 
         await paymentRepository.AddAsync(payment, cancellationToken);
 
-        // Publish event to RabbitMQ so Enrollment module can consume it
-        await publishEndpoint.Publish(new PaymentSucceededEvent(request.StudentId, request.CourseId, payment.Id), cancellationToken);
+        // TODO: Publish event to RabbitMQ so Enrollment module can consume it
 
         return Result<Guid>.Success(payment.Id);
     }
