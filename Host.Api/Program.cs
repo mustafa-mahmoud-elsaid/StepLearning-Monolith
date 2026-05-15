@@ -3,6 +3,8 @@ using Courses.Infrastructure;
 using Enrollment.Application;
 using Host.Api.Middleware;
 using Identity.Application;
+using Host.Api.DataSeeders;
+using Courses.Infrastructure.Data;
 using Identity.Application.Infrastructure.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -81,4 +83,49 @@ app.MapControllers();
 // ── Seed Data ────────────────────────────────────────────────────
 await IdentitySeeder.SeedRolesAsync(app.Services);
 
+app.MapPost("/api/seed", async (IServiceProvider sp, ILogger<Program> logger) =>
+{
+    var sw = System.Diagnostics.Stopwatch.StartNew();
+    logger.LogInformation("Starting database seeding process...");
+
+    try
+    {
+        // 1. Roles
+        logger.LogInformation("Step 1/4: Seeding Roles...");
+        await IdentitySeeder.SeedRolesAsync(sp);
+
+        // 2. Identity (Students & Instructors)
+        logger.LogInformation("Step 2/4: Seeding Students & Instructors...");
+        var studentIds = await IdentitySeeder.SeedStudentsAsync(sp, 4000);
+        var instructorIds = await IdentitySeeder.SeedInstructorsAsync(sp, 500);
+
+        // 3. Courses, Sections, Items
+        logger.LogInformation("Step 3/4: Seeding Courses, Sections, and Items...");
+        var courseIds = await CourseSeeder.SeedCoursesAsync(sp, instructorIds);
+
+        // 4. Payments & Enrollments
+        logger.LogInformation("Step 4/4: Seeding Payments & Enrollments...");
+        await PaymentAndEnrollmentSeeder.SeedAsync(sp, studentIds, courseIds);
+
+        sw.Stop();
+        logger.LogInformation("Seeding completed successfully in {ElapsedMilliseconds}ms.", sw.ElapsedMilliseconds);
+
+        return Results.Ok(new 
+        { 
+            Message = "Database seeded successfully!",
+            ElapsedMilliseconds = sw.ElapsedMilliseconds,
+            StudentsSeeded = studentIds.Count,
+            InstructorsSeeded = instructorIds.Count,
+            CoursesSeeded = courseIds.Count
+        });
+    }
+    catch (Exception ex)
+    {
+        sw.Stop();
+        logger.LogError(ex, "Seeding failed after {ElapsedMilliseconds}ms.", sw.ElapsedMilliseconds);
+        return Results.Problem(detail: ex.Message, title: "Seeding Failed");
+    }
+})
+.WithName("SeedDatabase")
+.WithTags("System");
 app.Run();
