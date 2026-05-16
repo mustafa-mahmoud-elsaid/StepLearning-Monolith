@@ -1,6 +1,8 @@
 using Payment.Application.Domain.Entities;
+using Payment.Application.Domain.Enums;
 using Payment.Application.Repositories;
 using Payment.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace Payment.Infrastructure.Repositories;
 
@@ -10,5 +12,16 @@ internal sealed class PaymentRepository(PaymentDbContext dbContext) : IPaymentRe
     {
         await dbContext.PaymentRecords.AddAsync(payment, ct);
         await dbContext.SaveChangesAsync(ct);
+    }
+
+    public async Task<bool> HasSucceededPaymentAsync(Guid studentId, Guid courseId, CancellationToken ct = default)
+    {
+        return await dbContext.PaymentRecords
+            .AsNoTracking()
+            .AnyAsync(
+                payment => payment.StudentId == studentId
+                    && payment.CourseId == courseId
+                    && payment.Status == PaymentStatus.Succeeded,
+                ct);
     }
 }

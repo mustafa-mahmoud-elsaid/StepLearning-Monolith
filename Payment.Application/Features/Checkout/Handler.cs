@@ -31,6 +31,14 @@ internal sealed class Handler(
         if (!price.HasValue)
             return Result<Guid>.Failure("Course not found or not available for checkout");
 
+        var hasSucceededPayment = await paymentRepository.HasSucceededPaymentAsync(
+            request.StudentId,
+            request.CourseId,
+            cancellationToken);
+
+        if (hasSucceededPayment)
+            return Result<Guid>.Failure("Student has already paid for this course");
+
         PaymentRecord payment;
 
         try
