@@ -2,7 +2,6 @@ using Courses.Application;
 using Courses.Infrastructure;
 using Enrollment.Application;
 using Host.Api.Messaging;
-using Host.Api.Messaging.Consumers;
 using Host.Api.Middleware;
 using Identity.Application;
 using Host.Api.DataSeeders;
@@ -33,8 +32,7 @@ builder.Services.AddNotificationsInfrastructure();
 builder.Services.AddScoped<IIntegrationEventPublisher, MassTransitIntegrationEventPublisher>();
 builder.Services.AddMassTransit(cfg =>
 {
-    cfg.AddConsumer<EnrollmentCompletedNotificationAdapterConsumer>();
-    cfg.AddConsumer<NotificationRequestedConsumer>();
+    cfg.AddConsumer<EnrollmentCompletedNotificationConsumer>();
 
     cfg.UsingRabbitMq((context, rabbit) =>
     {

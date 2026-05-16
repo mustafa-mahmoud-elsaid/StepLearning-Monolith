@@ -9,11 +9,10 @@ public sealed class LoggingEmailSender(ILogger<LoggingEmailSender> logger) : IEm
     public Task SendAsync(EmailMessage message, CancellationToken cancellationToken = default)
     {
         logger.LogInformation(
-            "Email notification prepared. To: {To}, Subject: {Subject}, TemplateKey: {TemplateKey}, Data: {@Data}",
+            "Email notification prepared. To: {To}, Subject: {Subject}, Body: {Body}",
             message.To,
             message.Subject,
-            message.TemplateKey,
-            message.Data);
+            message.Body);
 
         return Task.CompletedTask;
     }
