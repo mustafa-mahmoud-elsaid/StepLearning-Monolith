@@ -1,6 +1,7 @@
 ﻿using Enrollment.Application.Repositories;
 using MediatR;
 using StepLearning.Shared.Abstraction;
+using StepLearning.Shared.Events;
 using StepLearning.Shared.Result;
 
 namespace Enrollment.Application.Features.Commands.Enroll;
@@ -8,7 +9,8 @@ namespace Enrollment.Application.Features.Commands.Enroll;
 internal sealed class Handler(
     ICourseService courseService,
     IStudentService studentService,
-    IEnrollmentRepository enrollmentRepository
+    IEnrollmentRepository enrollmentRepository,
+    IIntegrationEventPublisher integrationEventPublisher
     ) : IRequestHandler<EnrollStudentCommand, Result>
 {
     public async Task<Result> Handle(EnrollStudentCommand request, CancellationToken cancellationToken)
@@ -47,6 +49,15 @@ internal sealed class Handler(
 
 
         await enrollmentRepository.AddEnrollment(enrollment, cancellationToken);
+
+        await integrationEventPublisher.PublishAsync(
+            new EnrollmentCompletedEvent(
+                enrollment.Id,
+                enrollment.StudentId,
+                enrollment.CourseId,
+                enrollment.PaymentId,
+                DateTime.UtcNow),
+            cancellationToken);
 
         return Result.Success();
     }
