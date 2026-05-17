@@ -1,15 +1,21 @@
 using Courses.Application;
 using Courses.Infrastructure;
 using Enrollment.Application;
+using Enrollment.Application.Consumers;
+using Host.Api.Messaging;
 using Host.Api.Middleware;
 using Identity.Application;
 using Host.Api.DataSeeders;
 using Courses.Infrastructure.Data;
 using Identity.Application.Infrastructure.Data;
+using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Notifications.Infrastructure;
+using Notifications.Infrastructure.Consumers;
 using Payment.Application;
 using Payment.Infrastructure;
+using StepLearning.Shared.Abstraction;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,6 +28,30 @@ builder.Services.AddIdentityApplication(builder.Configuration);
 builder.Services.AddEnrollmentApplication(builder.Configuration);
 builder.Services.AddPaymentApplication();
 builder.Services.AddPaymentInfrastructure(builder.Configuration);
+builder.Services.AddNotificationsInfrastructure();
+
+builder.Services.AddScoped<IIntegrationEventPublisher, MassTransitIntegrationEventPublisher>();
+builder.Services.AddMassTransit(cfg =>
+{
+    cfg.AddConsumer<PaymentSucceededConsumer>();
+    cfg.AddConsumer<EnrollmentCompletedNotificationConsumer>();
+
+    cfg.UsingRabbitMq((context, rabbit) =>
+    {
+        var host = builder.Configuration["RabbitMq:Host"] ?? "localhost";
+        var virtualHost = builder.Configuration["RabbitMq:VirtualHost"] ?? "/";
+        var username = builder.Configuration["RabbitMq:Username"] ?? "guest";
+        var password = builder.Configuration["RabbitMq:Password"] ?? "guest";
+
+        rabbit.Host(host, 56723, virtualHost, h =>
+        {
+            h.Username(username);
+            h.Password(password);
+        });
+
+        rabbit.ConfigureEndpoints(context);
+    });
+});
 
 // ── API Infrastructure ───────────────────────────────────────────
 builder.Services.AddControllers();

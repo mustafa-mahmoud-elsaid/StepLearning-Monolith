@@ -1,4 +1,3 @@
-using MassTransit;
 using MediatR;
 using Payment.Application.Domain.Entities;
 using Payment.Application.Repositories;
@@ -11,7 +10,8 @@ namespace Payment.Application.Features.Checkout;
 internal sealed class Handler(
     ICourseService courseService,
     IStudentService studentService,
-    IPaymentRepository paymentRepository) : IRequestHandler<CheckoutCommand, Result<Guid>>
+    IPaymentRepository paymentRepository,
+    IIntegrationEventPublisher integrationEventPublisher) : IRequestHandler<CheckoutCommand, Result<Guid>>
 {
     public async Task<Result<Guid>> Handle(CheckoutCommand request, CancellationToken cancellationToken)
     {
@@ -31,6 +31,14 @@ internal sealed class Handler(
         if (!price.HasValue)
             return Result<Guid>.Failure("Course not found or not available for checkout");
 
+        var hasSucceededPayment = await paymentRepository.HasSucceededPaymentAsync(
+            request.StudentId,
+            request.CourseId,
+            cancellationToken);
+
+        if (hasSucceededPayment)
+            return Result<Guid>.Failure("Student has already paid for this course");
+
         PaymentRecord payment;
 
         try
@@ -47,7 +55,9 @@ internal sealed class Handler(
 
         await paymentRepository.AddAsync(payment, cancellationToken);
 
-        // TODO: Publish event to RabbitMQ so Enrollment module can consume it
+        await integrationEventPublisher.PublishAsync(
+            new PaymentSucceededEvent(payment.StudentId, payment.CourseId, payment.Id),
+            cancellationToken);
 
         return Result<Guid>.Success(payment.Id);
     }
