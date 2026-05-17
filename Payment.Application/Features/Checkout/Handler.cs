@@ -1,8 +1,8 @@
 using MediatR;
 using Payment.Application.Domain.Entities;
 using Payment.Application.Repositories;
+using Payment.Application.ServicesInterfaces;
 using StepLearning.Shared.Abstraction;
-using StepLearning.Shared.Events;
 using StepLearning.Shared.Result;
 
 namespace Payment.Application.Features.Checkout;
@@ -11,25 +11,25 @@ internal sealed class Handler(
     ICourseService courseService,
     IStudentService studentService,
     IPaymentRepository paymentRepository,
-    IIntegrationEventPublisher integrationEventPublisher) : IRequestHandler<CheckoutCommand, Result<Guid>>
+    IPaymentService paymentService) : IRequestHandler<CheckoutCommand, Result<string>>
 {
-    public async Task<Result<Guid>> Handle(CheckoutCommand request, CancellationToken cancellationToken)
+    public async Task<Result<string>> Handle(CheckoutCommand request, CancellationToken cancellationToken)
     {
         if (request.StudentId == Guid.Empty)
-            return Result<Guid>.Failure("Student id must not be empty");
+            return Result<string>.Failure("Student id must not be empty");
 
         if (request.CourseId == Guid.Empty)
-            return Result<Guid>.Failure("Course id must not be empty");
+            return Result<string>.Failure("Course id must not be empty");
 
         var validStudent = await studentService.Exists(request.StudentId, cancellationToken);
 
         if (!validStudent)
-            return Result<Guid>.Failure("Student not found");
+            return Result<string>.Failure("Student not found");
 
         var price = await courseService.GetPrice(request.CourseId, cancellationToken);
 
         if (!price.HasValue)
-            return Result<Guid>.Failure("Course not found or not available for checkout");
+            return Result<string>.Failure("Course not found or not available for checkout");
 
         var hasSucceededPayment = await paymentRepository.HasSucceededPaymentAsync(
             request.StudentId,
@@ -37,28 +37,27 @@ internal sealed class Handler(
             cancellationToken);
 
         if (hasSucceededPayment)
-            return Result<Guid>.Failure("Student has already paid for this course");
+            return Result<string>.Failure("Student has already paid for this course");
 
         PaymentRecord payment;
+        string paymentUrl;
 
         try
         {
             payment = PaymentRecord.CreateCheckout(request.StudentId, request.CourseId, price.Value);
-            
-            // FAKE PAYMENT INTEGRATION (To be replaced with real Stripe/Paymob later)
-            payment.MarkSucceeded($"fake_txn_{Guid.NewGuid().ToString("N")[..8]}");
+            paymentUrl = await paymentService.CreatePaymentUrl(
+                payment.Id,
+                payment.StudentId,
+                payment.CourseId,
+                payment.Amount);
         }
         catch (InvalidOperationException ex)
         {
-            return Result<Guid>.Failure(ex.Message);
+            return Result<string>.Failure(ex.Message);
         }
 
         await paymentRepository.AddAsync(payment, cancellationToken);
 
-        await integrationEventPublisher.PublishAsync(
-            new PaymentSucceededEvent(payment.StudentId, payment.CourseId, payment.Id),
-            cancellationToken);
-
-        return Result<Guid>.Success(payment.Id);
+        return Result<string>.Success(paymentUrl);
     }
 }

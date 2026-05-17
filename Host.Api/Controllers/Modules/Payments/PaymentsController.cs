@@ -19,11 +19,11 @@ public class PaymentsController(IMediator mediator) : ControllerBase
         var result = await mediator.Send(new CheckoutCommand(studentId, request.CourseId), ct);
 
         return result.IsSuccess
-            ? Ok(new CheckoutResponse(result.Value))
+            ? Ok(new CheckoutResponse(result.Value!))
             : BadRequest(result.Error);
     }
 }
 
 public record CheckoutRequest(Guid CourseId);
 
-public record CheckoutResponse(Guid PaymentId);
+public record CheckoutResponse(string PaymentUrl);
