@@ -1,4 +1,3 @@
-using MassTransit;
 using MediatR;
 using Payment.Application.Domain.Entities;
 using Payment.Application.Repositories;
@@ -11,7 +10,8 @@ namespace Payment.Application.Features.Checkout;
 internal sealed class Handler(
     ICourseService courseService,
     IStudentService studentService,
-    IPaymentRepository paymentRepository) : IRequestHandler<CheckoutCommand, Result<Guid>>
+    IPaymentRepository paymentRepository,
+    IIntegrationEventPublisher integrationEventPublisher) : IRequestHandler<CheckoutCommand, Result<Guid>>
 {
     public async Task<Result<Guid>> Handle(CheckoutCommand request, CancellationToken cancellationToken)
     {
@@ -55,7 +55,9 @@ internal sealed class Handler(
 
         await paymentRepository.AddAsync(payment, cancellationToken);
 
-        // TODO: Publish event to RabbitMQ so Enrollment module can consume it
+        await integrationEventPublisher.PublishAsync(
+            new PaymentSucceededEvent(payment.StudentId, payment.CourseId, payment.Id),
+            cancellationToken);
 
         return Result<Guid>.Success(payment.Id);
     }
