@@ -1,0 +1,11 @@
+namespace Payment.Infrastructure.Options;
+
+internal sealed class StripeOptions
+{
+    public const string SectionName = "Stripe";
+
+    public string SecretKey { get; init; } = string.Empty;
+    public string SuccessUrl { get; init; } = string.Empty;
+    public string CancelUrl { get; init; } = string.Empty;
+    public string Currency { get; init; } = "usd";
+}
