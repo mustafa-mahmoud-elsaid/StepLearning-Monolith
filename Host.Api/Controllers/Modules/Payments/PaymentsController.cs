@@ -8,7 +8,9 @@ namespace Host.Api.Controllers.Modules.Payments;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize(Roles = "Student")]
-public class PaymentsController(IMediator mediator) : ControllerBase
+public class PaymentsController(
+    IMediator mediator,
+    ILogger<PaymentsController> logger) : ControllerBase
 {
     [HttpPost("checkout")]
     public async Task<IActionResult> Checkout([FromBody] CheckoutRequest request, CancellationToken ct)
@@ -21,6 +23,22 @@ public class PaymentsController(IMediator mediator) : ControllerBase
         return result.IsSuccess
             ? Ok(new CheckoutResponse(result.Value!))
             : BadRequest(result.Error);
+    }
+
+    [HttpPost("webhook")]
+    [AllowAnonymous]
+    public async Task<IActionResult> StripeWebhook(CancellationToken ct)
+    {
+        using var reader = new StreamReader(Request.Body);
+        var payload = await reader.ReadToEndAsync(ct);
+        var stripeSignature = Request.Headers["Stripe-Signature"].ToString();
+
+        logger.LogInformation(
+            "Stripe webhook triggered. PayloadLength: {PayloadLength}, HasStripeSignature: {HasStripeSignature}",
+            payload.Length,
+            !string.IsNullOrWhiteSpace(stripeSignature));
+
+        return Ok();
     }
 }
 
