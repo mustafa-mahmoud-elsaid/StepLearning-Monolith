@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Payment.Application.Features.Checkout;
+using Payment.Application.ServicesInterfaces;
 
 namespace Host.Api.Controllers.Modules.Payments;
 
@@ -10,7 +11,7 @@ namespace Host.Api.Controllers.Modules.Payments;
 [Authorize(Roles = "Student")]
 public class PaymentsController(
     IMediator mediator,
-    ILogger<PaymentsController> logger) : ControllerBase
+    IPaymentWebhookService paymentWebhookService) : ControllerBase
 {
     [HttpPost("checkout")]
     public async Task<IActionResult> Checkout([FromBody] CheckoutRequest request, CancellationToken ct)
@@ -32,13 +33,16 @@ public class PaymentsController(
         using var reader = new StreamReader(Request.Body);
         var payload = await reader.ReadToEndAsync(ct);
         var stripeSignature = Request.Headers["Stripe-Signature"].ToString();
+        var result = await paymentWebhookService.HandleStripeWebhookAsync(payload, stripeSignature, ct);
 
-        logger.LogInformation(
-            "Stripe webhook triggered. PayloadLength: {PayloadLength}, HasStripeSignature: {HasStripeSignature}",
-            payload.Length,
-            !string.IsNullOrWhiteSpace(stripeSignature));
-
-        return Ok();
+        return result.Status switch
+        {
+            PaymentWebhookStatus.Processed => Ok(),
+            PaymentWebhookStatus.Ignored => Ok(),
+            PaymentWebhookStatus.NotFound => NotFound(result.Error),
+            PaymentWebhookStatus.Invalid => BadRequest(result.Error),
+            _ => BadRequest()
+        };
     }
 }
 
