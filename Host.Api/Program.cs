@@ -13,8 +13,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Notifications.Infrastructure;
 using Notifications.Infrastructure.Consumers;
-using Payment.Application;
-using Payment.Infrastructure;
+using Commerce.Application;
+using Commerce.Infrastructure;
 using StepLearning.Shared.Abstraction;
 using System.Text;
 
@@ -26,8 +26,8 @@ builder.Services.AddCoursesApplication();
 builder.Services.AddCoursesInfrastructure(builder.Configuration);
 builder.Services.AddIdentityApplication(builder.Configuration);
 builder.Services.AddEnrollmentApplication(builder.Configuration);
-builder.Services.AddPaymentApplication();
-builder.Services.AddPaymentInfrastructure(builder.Configuration);
+builder.Services.AddCommerceApplication();
+builder.Services.AddCommerceInfrastructure(builder.Configuration);
 builder.Services.AddNotificationsInfrastructure();
 
 builder.Services.AddScoped<IIntegrationEventPublisher, MassTransitIntegrationEventPublisher>();

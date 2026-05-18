@@ -1,8 +1,8 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Payment.Application.Features.Checkout;
-using Payment.Application.ServicesInterfaces;
+using Commerce.Application.Payment.Features.Checkout;
+using Commerce.Application.Payment.ServicesInterfaces;
 
 namespace Host.Api.Controllers.Modules.Payments;
 
