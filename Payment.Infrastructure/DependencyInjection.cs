@@ -27,6 +27,7 @@ public static class DependencyInjection
         services.Configure<StripeOptions>(configuration.GetSection(StripeOptions.SectionName));
         StripeConfiguration.ApiKey = configuration["Stripe:SecretKey"];
         services.AddScoped<IPaymentService, StripePaymentService>();
+        services.AddScoped<IPaymentWebhookService, StripePaymentWebhookService>();
 
         return services;
     }
