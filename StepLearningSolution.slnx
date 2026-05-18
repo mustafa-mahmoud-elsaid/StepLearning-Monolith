@@ -20,6 +20,10 @@
     <Project Path="Payment.Application/Payment.Application.csproj" />
     <Project Path="Payment.Infrastructure/Payment.Infrastructure.csproj" />
   </Folder>
+  <Folder Name="/src/Modules/Commerce/">
+    <Project Path="Commerce/Commerce.Application/Commerce.Application.csproj" />
+    <Project Path="Commerce/Commerce.Infrastructure/Commerce.Infrastructure.csproj" />
+  </Folder>
   <Folder Name="/src/Shared/">
     <Project Path="StepLearning.Shared/StepLearning.Shared.csproj" Id="f6126f0c-0a4c-4851-9a18-a675d0663f17" />
   </Folder>
