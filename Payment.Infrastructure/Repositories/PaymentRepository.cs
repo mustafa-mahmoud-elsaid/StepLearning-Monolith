@@ -14,6 +14,12 @@ internal sealed class PaymentRepository(PaymentDbContext dbContext) : IPaymentRe
         await dbContext.SaveChangesAsync(ct);
     }
 
+    public async Task<PaymentRecord?> GetByIdAsync(Guid paymentId, CancellationToken ct = default)
+    {
+        return await dbContext.PaymentRecords
+            .FirstOrDefaultAsync(payment => payment.Id == paymentId, ct);
+    }
+
     public async Task<bool> HasSucceededPaymentAsync(Guid studentId, Guid courseId, CancellationToken ct = default)
     {
         return await dbContext.PaymentRecords
@@ -23,5 +29,10 @@ internal sealed class PaymentRepository(PaymentDbContext dbContext) : IPaymentRe
                     && payment.CourseId == courseId
                     && payment.Status == PaymentStatus.Succeeded,
                 ct);
+    }
+
+    public Task<int> SaveChangesAsync(CancellationToken ct = default)
+    {
+        return dbContext.SaveChangesAsync(ct);
     }
 }

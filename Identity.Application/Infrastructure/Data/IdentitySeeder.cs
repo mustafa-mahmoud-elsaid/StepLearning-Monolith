@@ -1,7 +1,7 @@
 using Bogus;
 using EFCore.BulkExtensions;
 using Identity.Application.Domain;
-using Identity.Application.Domain.Entities;
+wusing Identity.Application.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
