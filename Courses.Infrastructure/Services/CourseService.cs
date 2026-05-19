@@ -20,4 +20,12 @@ internal class CourseService(ICoursesRepository coursesRepository) : ICourseServ
 
         return await coursesRepository.GetCoursePriceAsync(courseId, ct);
     }
+
+    public async Task<CourseSnapshot?> GetSnapshot(Guid courseId, CancellationToken ct = default)
+    {
+        if (courseId == Guid.Empty)
+            return null;
+
+        return await coursesRepository.GetCourseSnapshotAsync(courseId, ct);
+    }
 }

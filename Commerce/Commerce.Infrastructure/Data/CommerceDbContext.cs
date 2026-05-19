@@ -1,3 +1,4 @@
+using Commerce.Application.Cart.Domain.Entities;
 using Commerce.Application.Payment.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -6,6 +7,8 @@ namespace Commerce.Infrastructure.Data;
 public class CommerceDbContext : DbContext
 {
     public DbSet<PaymentRecord> PaymentRecords { get; set; }
+    public DbSet<Cart> Carts { get; set; }
+    public DbSet<CartItem> CartItems { get; set; }
 
     public CommerceDbContext(DbContextOptions<CommerceDbContext> options) : base(options)
     {
@@ -42,6 +45,47 @@ public class CommerceDbContext : DbContext
                 .IsRequired();
 
             entity.HasIndex(e => new { e.StudentId, e.CourseId, e.Status });
+        });
+
+        modelBuilder.Entity<Cart>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.StudentId)
+                .IsRequired();
+
+            entity.Property(e => e.CreatedAt)
+                .IsRequired();
+
+            entity.Property(e => e.UpdatedAt)
+                .IsRequired();
+
+            entity.HasIndex(e => e.StudentId)
+                .IsUnique();
+
+            entity.HasMany(e => e.Items)
+                .WithOne()
+                .HasForeignKey(e => e.CartId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<CartItem>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.CourseId)
+                .IsRequired();
+
+            entity.Property(e => e.Price)
+                .HasColumnType("decimal(18,2)")
+                .IsRequired();
+
+            entity.Property(e => e.CourseTitle)
+                .HasMaxLength(250)
+                .IsRequired();
+
+            entity.HasIndex(e => new { e.CartId, e.CourseId })
+                .IsUnique();
         });
     }
 }

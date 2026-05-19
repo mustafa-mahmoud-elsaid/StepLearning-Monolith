@@ -1,5 +1,6 @@
 using Courses.Application.DTO;
 using Courses.Domain.Entities;
+using StepLearning.Shared.Abstraction;
 using StepLearning.Shared.Pagination;
 
 namespace Courses.Application.RepositoriesContracts;
@@ -19,4 +20,5 @@ public interface ICoursesRepository
     Task<PaginatedResult<CourseCardDto>> GetStudentCoursesAsync(IEnumerable<Guid> coursesIds, int pageNumber = 1, int pageSize = 10, CancellationToken cancellationToken = default);
     Task<bool> Exists(Guid courseId, CancellationToken ct = default);
     Task<decimal?> GetCoursePriceAsync(Guid courseId, CancellationToken ct = default);
+    Task<CourseSnapshot?> GetCourseSnapshotAsync(Guid courseId, CancellationToken ct = default);
 }

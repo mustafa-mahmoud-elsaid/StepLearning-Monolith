@@ -3,6 +3,7 @@ using Courses.Application.RepositoriesContracts;
 using Courses.Domain.Entities;
 using Courses.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using StepLearning.Shared.Abstraction;
 using StepLearning.Shared.Pagination;
 
 namespace Courses.Infrastructure.Repositories;
@@ -235,6 +236,15 @@ internal sealed class CoursesRepository : ICoursesRepository
             .AsNoTracking()
             .Where(c => c.Id == courseId && c.IsPublished && !c.IsDeleted)
             .Select(c => c.Price)
+            .FirstOrDefaultAsync(ct);
+    }
+
+    public async Task<CourseSnapshot?> GetCourseSnapshotAsync(Guid courseId, CancellationToken ct = default)
+    {
+        return await _dbContext.Courses
+            .AsNoTracking()
+            .Where(c => c.Id == courseId && c.IsPublished && !c.IsDeleted && c.Price.HasValue)
+            .Select(c => new CourseSnapshot(c.Id, c.Title, c.Price!.Value))
             .FirstOrDefaultAsync(ct);
     }
 
