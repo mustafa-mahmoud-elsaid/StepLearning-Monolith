@@ -16,10 +16,11 @@ public class PaymentsController(
     [HttpPost("checkout")]
     public async Task<IActionResult> Checkout([FromBody] CheckoutRequest request, CancellationToken ct)
     {
-        if (!Guid.TryParse(User.FindFirst("studentId")?.Value, out var studentId))
-            return Unauthorized("Student ID not found in token.");
+        var studentIdClaim = User.FindFirst("studentId");
+        if (studentIdClaim is null || !Guid.TryParse(studentIdClaim.Value, out var studentId))
+            return Unauthorized();
 
-        var result = await mediator.Send(new CheckoutCommand(studentId, request.CourseId), ct);
+        var result = await mediator.Send(new CheckoutCommand(studentId, request.OrderId), ct);
 
         return result.IsSuccess
             ? Ok(new CheckoutResponse(result.Value!))
@@ -46,6 +47,6 @@ public class PaymentsController(
     }
 }
 
-public record CheckoutRequest(Guid CourseId);
+public record CheckoutRequest(Guid OrderId);
 
 public record CheckoutResponse(string PaymentUrl);

@@ -1,3 +1,4 @@
+using Commerce.Application.Orders.Repositories;
 using Commerce.Application.Payment.Repositories;
 using Commerce.Application.Payment.ServicesInterfaces;
 using Commerce.Infrastructure.Options;
@@ -13,6 +14,7 @@ namespace Commerce.Infrastructure.Services;
 internal sealed class StripePaymentWebhookService(
     IOptions<StripeOptions> stripeOptions,
     IPaymentRepository paymentRepository,
+    IOrderRepository orderRepository,
     IIntegrationEventPublisher integrationEventPublisher,
     ILogger<StripePaymentWebhookService> logger) : IPaymentWebhookService
 {
@@ -77,12 +79,27 @@ internal sealed class StripePaymentWebhookService(
 
         await paymentRepository.SaveChangesAsync(cancellationToken);
 
-        await integrationEventPublisher.PublishAsync(
-            new PaymentSucceededEvent(payment.StudentId, payment.CourseId, payment.Id),
-            cancellationToken);
+        var order = await orderRepository.GetByIdAsync(payment.OrderId, cancellationToken);
+
+        if (order is not null)
+        {
+            order.MarkAsPaid(payment.Id);
+            await orderRepository.SaveChangesAsync(cancellationToken);
+
+            foreach (var item in order.Items)
+            {
+                await integrationEventPublisher.PublishAsync(
+                    new PaymentSucceededEvent(payment.StudentId, item.CourseId, payment.Id),
+                    cancellationToken);
+            }
+        }
+        else
+        {
+            logger.LogWarning("Payment {PaymentId} succeeded but Order {OrderId} was not found.", payment.Id, payment.OrderId);
+        }
 
         logger.LogInformation(
-            "Payment {PaymentId} succeeded from Stripe webhook and PaymentSucceededEvent was published.",
+            "Payment {PaymentId} succeeded from Stripe webhook and PaymentSucceededEvents were published.",
             payment.Id);
 
         return PaymentWebhookResult.Processed();

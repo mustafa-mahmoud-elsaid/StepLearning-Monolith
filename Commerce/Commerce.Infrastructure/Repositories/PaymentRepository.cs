@@ -20,13 +20,13 @@ internal sealed class PaymentRepository(CommerceDbContext dbContext) : IPaymentR
             .FirstOrDefaultAsync(payment => payment.Id == paymentId, ct);
     }
 
-    public async Task<bool> HasSucceededPaymentAsync(Guid studentId, Guid courseId, CancellationToken ct = default)
+    public async Task<bool> HasSucceededPaymentAsync(Guid studentId, Guid orderId, CancellationToken ct = default)
     {
         return await dbContext.PaymentRecords
             .AsNoTracking()
             .AnyAsync(
                 payment => payment.StudentId == studentId
-                    && payment.CourseId == courseId
+                    && payment.OrderId == orderId
                     && payment.Status == PaymentStatus.Succeeded,
                 ct);
     }

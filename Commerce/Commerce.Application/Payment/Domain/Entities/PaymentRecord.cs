@@ -6,7 +6,7 @@ public class PaymentRecord
 {
     public Guid Id { get; private set; }
     public Guid StudentId { get; private set; }
-    public Guid CourseId { get; private set; }
+    public Guid OrderId { get; private set; }
     public decimal Amount { get; private set; }
     public string Currency { get; private set; } = "USD";
     public string? ProviderReference { get; private set; }
@@ -14,13 +14,13 @@ public class PaymentRecord
     public DateTime CreatedAt { get; private set; }
     public DateTime? ProcessedAt { get; private set; }
 
-    public static PaymentRecord CreateCheckout(Guid studentId, Guid courseId, decimal amount, string currency = "USD")
+    public static PaymentRecord CreateCheckout(Guid studentId, Guid orderId, decimal amount, string currency = "USD")
     {
         if (studentId == Guid.Empty)
             throw new InvalidOperationException("Student id can not be empty");
 
-        if (courseId == Guid.Empty)
-            throw new InvalidOperationException("Course id can not be empty");
+        if (orderId == Guid.Empty)
+            throw new InvalidOperationException("Order id can not be empty");
 
         if (amount < 0)
             throw new InvalidOperationException("Payment amount can not be negative");
@@ -32,7 +32,7 @@ public class PaymentRecord
         {
             Id = Guid.NewGuid(),
             StudentId = studentId,
-            CourseId = courseId,
+            OrderId = orderId,
             Amount = amount,
             Currency = currency,
             Status = PaymentStatus.Pending,

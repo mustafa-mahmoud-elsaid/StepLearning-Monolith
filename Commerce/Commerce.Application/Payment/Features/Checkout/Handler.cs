@@ -5,10 +5,13 @@ using MediatR;
 using StepLearning.Shared.Abstraction;
 using StepLearning.Shared.Result;
 
+using Commerce.Application.Orders.Domain.Enums;
+using Commerce.Application.Orders.Repositories;
+
 namespace Commerce.Application.Payment.Features.Checkout;
 
 internal sealed class Handler(
-    ICourseService courseService,
+    IOrderRepository orderRepository,
     IStudentService studentService,
     IPaymentRepository paymentRepository,
     IPaymentService paymentService) : IRequestHandler<CheckoutCommand, Result<string>>
@@ -18,37 +21,35 @@ internal sealed class Handler(
         if (request.StudentId == Guid.Empty)
             return Result<string>.Failure("Student id must not be empty");
 
-        if (request.CourseId == Guid.Empty)
-            return Result<string>.Failure("Course id must not be empty");
+        if (request.OrderId == Guid.Empty)
+            return Result<string>.Failure("Order id must not be empty");
 
         var validStudent = await studentService.Exists(request.StudentId, cancellationToken);
 
         if (!validStudent)
             return Result<string>.Failure("Student not found");
 
-        var price = await courseService.GetPrice(request.CourseId, cancellationToken);
+        var order = await orderRepository.GetByIdAsync(request.OrderId, cancellationToken);
 
-        if (!price.HasValue)
-            return Result<string>.Failure("Course not found or not available for checkout");
+        if (order is null)
+            return Result<string>.Failure("Order not found");
 
-        var hasSucceededPayment = await paymentRepository.HasSucceededPaymentAsync(
-            request.StudentId,
-            request.CourseId,
-            cancellationToken);
+        if (order.StudentId != request.StudentId)
+            return Result<string>.Failure("Order does not belong to the student");
 
-        if (hasSucceededPayment)
-            return Result<string>.Failure("Student has already paid for this course");
+        if (order.Status != OrderStatus.Pending)
+            return Result<string>.Failure($"Order is not pending. Current status: {order.Status}");
 
         PaymentRecord payment;
         string paymentUrl;
 
         try
         {
-            payment = PaymentRecord.CreateCheckout(request.StudentId, request.CourseId, price.Value);
+            payment = PaymentRecord.CreateCheckout(request.StudentId, request.OrderId, order.TotalAmount);
             paymentUrl = await paymentService.CreatePaymentUrl(
                 payment.Id,
                 payment.StudentId,
-                payment.CourseId,
+                payment.OrderId,
                 payment.Amount);
         }
         catch (InvalidOperationException ex)

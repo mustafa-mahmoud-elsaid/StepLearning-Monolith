@@ -1,4 +1,5 @@
 using Commerce.Application.Cart.Repositories;
+using Commerce.Application.Orders.Repositories;
 using Commerce.Application.Payment.Repositories;
 using Commerce.Application.Payment.ServicesInterfaces;
 using Commerce.Infrastructure.Data;
@@ -26,6 +27,7 @@ public static class DependencyInjection
 
         services.AddScoped<IPaymentRepository, PaymentRepository>();
         services.AddScoped<ICartRepository, CartRepository>();
+        services.AddScoped<IOrderRepository, OrderRepository>();
         services.Configure<StripeOptions>(configuration.GetSection(StripeOptions.SectionName));
         StripeConfiguration.ApiKey = configuration["Stripe:SecretKey"];
         services.AddScoped<IPaymentService, StripePaymentService>();
