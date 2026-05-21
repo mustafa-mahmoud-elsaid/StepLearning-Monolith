@@ -25,10 +25,10 @@ public class EnrollmentsController : ControllerBase
         if (!Guid.TryParse(User.FindFirst("studentId")?.Value, out var studentId))
             return Unauthorized("Student ID not found in token.");
 
-        var dto = new EnrollStudentRequestDto(studentId, request.CourseId, request.PaymentId, request.Status);
+        var dto = new EnrollStudentRequestDto(studentId, request.CourseIds, request.PaymentId, request.Status);
         var result = await _mediator.Send(new EnrollStudentCommand(dto), ct);
         return result.IsSuccess ? Ok() : BadRequest(result.Error);
     }
 }
 
-public record EnrollRequest(Guid CourseId, Guid PaymentId, EnrollmentStatus Status = EnrollmentStatus.Active);
+public record EnrollRequest(List<Guid> CourseIds, Guid PaymentId, EnrollmentStatus Status = EnrollmentStatus.Active);

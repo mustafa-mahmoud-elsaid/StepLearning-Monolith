@@ -18,6 +18,12 @@ internal class EnrollmentRepository : IEnrollmentRepository
         await _dbContext.SaveChangesAsync(ct);
     }
 
+    public async Task AddEnrollments(IEnumerable<Domain.Entities.Enrollment> enrollments, CancellationToken ct = default)
+    {
+        await _dbContext.Enrollments.AddRangeAsync(enrollments, ct);
+        await _dbContext.SaveChangesAsync(ct);
+    }
+
     public async Task<bool> IsEnrolled(Guid studentId, Guid courseId, CancellationToken ct = default)
     {
         return await _dbContext.Enrollments

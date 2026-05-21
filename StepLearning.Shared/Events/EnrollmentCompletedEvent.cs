@@ -1,8 +1,8 @@
 namespace StepLearning.Shared.Events;
 
+public record EnrolledCourseDetails(string CourseName, string? CourseThumbnailUrl);
+
 public record EnrollmentCompletedEvent(
-    Guid EnrollmentId,
-    Guid StudentId,
-    Guid CourseId,
-    Guid PaymentId,
+    string StudentEmail,
+    List<EnrolledCourseDetails> Courses,
     DateTime OccurredAtUtc);

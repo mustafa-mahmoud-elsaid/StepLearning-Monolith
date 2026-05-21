@@ -1,4 +1,4 @@
-﻿using Enrollment.Application.Repositories;
+using Enrollment.Application.Repositories;
 using MediatR;
 using StepLearning.Shared.Abstraction;
 using StepLearning.Shared.Events;
@@ -17,47 +17,49 @@ internal sealed class Handler(
     {
         var dto = request.dto;
 
-        // validate on user and course id
-        var validCourse = await courseService.Exists(dto.CourseId);
+        var studentEmail = await studentService.GetEmail(dto.StudentId, cancellationToken); 
 
-        if (!validCourse)
-            return Result.Failure("Failed to enroll, courses not exists");
-
-        var validStudent = await studentService.Exists(dto.StudentId); 
-
-        if(!validStudent)
+        if (string.IsNullOrWhiteSpace(studentEmail))
             return Result.Failure("Failed to enroll, student not exists");
 
-        var isEnrolled =  await enrollmentRepository.IsEnrolled(dto.StudentId, dto.CourseId, cancellationToken);
+        var enrollmentsToCreate = new List<(Domain.Entities.Enrollment Enrollment, string CourseName, string? ThumbnailUrl)>();
 
-        if (isEnrolled)
-            return Result.Failure("Student is already enrolled");
-
-        // TODO:check if the user payment succeeded
-
-
-        Domain.Entities.Enrollment enrollment;
-        try
+        foreach (var courseId in dto.CourseIds)
         {
-            enrollment = Domain.Entities.Enrollment.Create(dto.StudentId, dto.CourseId, dto.PaymentId, dto.Status);
+            var courseSnapshot = await courseService.GetSnapshot(courseId, cancellationToken);
+            if (courseSnapshot is null)
+                return Result.Failure($"Failed to enroll, course {courseId} not exists or is not available for purchase");
+
+            var isEnrolled = await enrollmentRepository.IsEnrolled(dto.StudentId, courseId, cancellationToken);
+            if (isEnrolled)
+                continue;
+
+            try
+            {
+                var enrollment = Domain.Entities.Enrollment.Create(dto.StudentId, courseId, dto.PaymentId, dto.Status);
+                enrollmentsToCreate.Add((enrollment, courseSnapshot.Title, courseSnapshot.ThumbnailUrl));
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Result.Failure(ex.Message);
+            }
         }
-        catch (InvalidOperationException ex)
+
+        if (enrollmentsToCreate.Any())
         {
+            await enrollmentRepository.AddEnrollments(enrollmentsToCreate.Select(x => x.Enrollment), cancellationToken);
 
-            return Result.Failure(ex.Message);
+            var coursesDetails = enrollmentsToCreate
+                .Select(x => new EnrolledCourseDetails(x.CourseName, x.ThumbnailUrl))
+                .ToList();
+
+            await integrationEventPublisher.PublishAsync(
+                new EnrollmentCompletedEvent(
+                    studentEmail,
+                    coursesDetails,
+                    DateTime.UtcNow),
+                cancellationToken);
         }
-
-
-        await enrollmentRepository.AddEnrollment(enrollment, cancellationToken);
-
-        await integrationEventPublisher.PublishAsync(
-            new EnrollmentCompletedEvent(
-                enrollment.Id,
-                enrollment.StudentId,
-                enrollment.CourseId,
-                enrollment.PaymentId,
-                DateTime.UtcNow),
-            cancellationToken);
 
         return Result.Success();
     }

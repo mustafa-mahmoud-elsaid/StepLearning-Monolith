@@ -4,8 +4,8 @@ using Enrollment.Application.Data;
 using Enrollment.Application.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Payment.Application.Domain.Entities;
-using Payment.Infrastructure.Data;
+using Commerce.Application.Payment.Domain.Entities;
+using Commerce.Infrastructure.Data;
 
 namespace Host.Api.DataSeeders;
 
@@ -17,7 +17,7 @@ public static class PaymentAndEnrollmentSeeder
             return;
 
         using var scope = serviceProvider.CreateScope();
-        var paymentContext = scope.ServiceProvider.GetRequiredService<PaymentDbContext>();
+        var paymentContext = scope.ServiceProvider.GetRequiredService<CommerceDbContext>();
         var enrollmentContext = scope.ServiceProvider.GetRequiredService<EnrollmentDbContext>();
 
         // If either context has data, skip seeding to prevent duplicates

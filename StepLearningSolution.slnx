@@ -16,9 +16,10 @@
     <Project Path="Notifications.Application/Notifications.Application.csproj" Id="5052bbbe-e83a-41ce-b9f4-62974cebd5f6" />
     <Project Path="Notifications.Infrastructure/Notifications.Infrastructure.csproj" Id="0abb0353-6b57-496f-8017-6ab11470e51f" />
   </Folder>
-  <Folder Name="/src/Modules/Payments/">
-    <Project Path="Payment.Application/Payment.Application.csproj" />
-    <Project Path="Payment.Infrastructure/Payment.Infrastructure.csproj" />
+  <Folder Name="/src/Modules/Commerce/">
+    <Project Path="Commerce/Commerce.Domain/Commerce.Domain.csproj" />
+    <Project Path="Commerce/Commerce.Application/Commerce.Application.csproj" />
+    <Project Path="Commerce/Commerce.Infrastructure/Commerce.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/src/Shared/">
     <Project Path="StepLearning.Shared/StepLearning.Shared.csproj" Id="f6126f0c-0a4c-4851-9a18-a675d0663f17" />
