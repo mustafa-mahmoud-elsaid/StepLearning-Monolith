@@ -7,27 +7,16 @@ using Microsoft.AspNetCore.Identity;
 using StepLearning.Shared.Result;
 
 namespace Identity.Application.Features.RefreshToken;
-
-public sealed class Handler : IRequestHandler<RefreshTokenCommand, Result<LoginResponse>>
-{
-    private readonly IRefreshTokenRepository _refreshTokenRepository;
-    private readonly ITokenService _tokenService;
-    private readonly UserManager<ApplicationUser> _userManager;
-
-    public Handler(
+public class Handler(
         IRefreshTokenRepository refreshTokenRepository,
         ITokenService tokenService,
-        UserManager<ApplicationUser> userManager)
-    {
-        _refreshTokenRepository = refreshTokenRepository;
-        _tokenService = tokenService;
-        _userManager = userManager;
-    }
+        UserManager<ApplicationUser> userManager) : IRequestHandler<RefreshTokenCommand, Result<LoginResponse>>
+{
 
     public async Task<Result<LoginResponse>> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
     {
         // 1. Find the existing refresh token
-        var existingToken = await _refreshTokenRepository.FindByTokenAsync(request.RefreshToken, cancellationToken);
+        var existingToken = await refreshTokenRepository.FindByTokenAsync(request.RefreshToken, cancellationToken);
 
         if (existingToken is null)
             return Result<LoginResponse>.Failure("Invalid refresh token.");
@@ -40,21 +29,23 @@ public sealed class Handler : IRequestHandler<RefreshTokenCommand, Result<LoginR
         existingToken.Revoke();
 
         // 4. Find the user who owns this token
-        var user = await _userManager.FindByIdAsync(existingToken.UserId.ToString());
+        var user = await userManager.FindByIdAsync(existingToken.UserId.ToString());
 
         if (user is null)
             return Result<LoginResponse>.Failure("User not found.");
 
         // 5. Generate new JWT + refresh token pair
-        var newJwtToken = await _tokenService.GenerateJWTToken(user);
-        var newRefreshTokenResult = await _tokenService.GenerateRefreshToken(user, cancellationToken);
+        var newJwtToken = await tokenService.GenerateJWTToken(user);
+        var newRefreshTokenResult = await tokenService.GenerateRefreshToken(user, cancellationToken);
 
         if (!newRefreshTokenResult.IsSuccess)
             return Result<LoginResponse>.Failure(newRefreshTokenResult.Error!);
 
         // 6. Persist the revocation + new token in one save
-        await _refreshTokenRepository.SaveChangesAsync(cancellationToken);
+        await refreshTokenRepository.SaveChangesAsync(cancellationToken);
 
         return Result<LoginResponse>.Success(new(newJwtToken, newRefreshTokenResult.Value!));
     }
 }
+
+

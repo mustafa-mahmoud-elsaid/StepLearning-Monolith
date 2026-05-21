@@ -10,12 +10,10 @@ internal sealed class Handler(
     UserRegistrationService registrationService) 
     : IRequestHandler<StudentRegisterCommand, Result<LoginResponse>>
 {
-    private readonly IGenericRepository<Domain.Entities.Student> _repository = repository;
-    private readonly UserRegistrationService _registrationService = registrationService;
 
     public async Task<Result<LoginResponse>> Handle(StudentRegisterCommand request, CancellationToken cancellationToken)
     {
-        var userResult = await _registrationService.CreateUserAsync(
+        var userResult = await registrationService.CreateUserAsync(
             request.Credentials.Email, request.Credentials.Password, Domain.AppRoles.Student, cancellationToken);
 
         if (!userResult.IsSuccess)
@@ -25,9 +23,10 @@ internal sealed class Handler(
             request.Credentials.FullName, userResult.Value!.Id,
             request.Credentials.DateOfBirth, request.Credentials.ProfilePictureUrl);
 
-        await _repository.AddAsync(student, cancellationToken);
-        await _repository.SaveChangesAsync(cancellationToken);
+        await repository.AddAsync(student, cancellationToken);
+        await repository.SaveChangesAsync(cancellationToken);
 
-        return await _registrationService.GenerateTokensAsync(userResult.Value!, cancellationToken);
+        return await registrationService.GenerateTokensAsync(userResult.Value!, cancellationToken);
     }
 }
+

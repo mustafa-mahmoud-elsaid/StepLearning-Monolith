@@ -34,3 +34,5 @@ internal sealed class Handler(IEnrollmentService enrollmentService, ICoursesRepo
         return Result<PaginatedResult<CourseCardDto>>.Success(result);
     }
 }
+
+

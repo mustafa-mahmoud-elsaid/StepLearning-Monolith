@@ -4,19 +4,12 @@ using MediatR;
 using StepLearning.Shared.Result;
 
 namespace Courses.Application.Features.Commands.Sections.ReorderSection;
-
-public class Handler : IRequestHandler<ReorderSectionCommand, Result>
+public class Handler(ISectionsRepository sectionsRepository) : IRequestHandler<ReorderSectionCommand, Result>
 {
-    private readonly ISectionsRepository _sectionsRepository;
-
-    public Handler(ISectionsRepository sectionsRepository)
-    {
-        _sectionsRepository = sectionsRepository;
-    }
 
     public async Task<Result> Handle(ReorderSectionCommand request, CancellationToken cancellationToken)
     {
-        var sections = await _sectionsRepository.GetSectionsByCourseIdAsync(request.CourseId, cancellationToken);
+        var sections = await sectionsRepository.GetSectionsByCourseIdAsync(request.CourseId, cancellationToken);
 
         if (sections.Count == 0)
             return Result.Failure("No sections found for this course.");
@@ -34,8 +27,10 @@ public class Handler : IRequestHandler<ReorderSectionCommand, Result>
             return Result.Failure(ex.Message);
         }
 
-        await _sectionsRepository.SaveChangesAsync(cancellationToken);
+        await sectionsRepository.SaveChangesAsync(cancellationToken);
 
         return Result.Success();
     }
 }
+
+

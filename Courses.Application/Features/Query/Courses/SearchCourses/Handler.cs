@@ -5,19 +5,12 @@ using StepLearning.Shared.Pagination;
 using StepLearning.Shared.Result;
 
 namespace Courses.Application.Features.Query.Courses.SearchCourses;
-
-public class Handler : IRequestHandler<SearchCoursesQuery, Result<PaginatedResult<CourseCardDto>>>
+public class Handler(ICoursesRepository coursesRepository) : IRequestHandler<SearchCoursesQuery, Result<PaginatedResult<CourseCardDto>>>
 {
-    private readonly ICoursesRepository _coursesRepository;
-
-    public Handler(ICoursesRepository coursesRepository)
-    {
-        _coursesRepository = coursesRepository;
-    }
 
     public async Task<Result<PaginatedResult<CourseCardDto>>> Handle(SearchCoursesQuery request, CancellationToken cancellationToken)
     {
-        var result = await _coursesRepository.SearchCoursesAsync(
+        var result = await coursesRepository.SearchCoursesAsync(
             request.Title,
             request.MinPrice,
             request.MaxPrice,
@@ -28,3 +21,5 @@ public class Handler : IRequestHandler<SearchCoursesQuery, Result<PaginatedResul
         return Result<PaginatedResult<CourseCardDto>>.Success(result);
     }
 }
+
+

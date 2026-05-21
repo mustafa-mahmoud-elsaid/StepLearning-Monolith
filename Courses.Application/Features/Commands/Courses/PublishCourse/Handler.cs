@@ -3,19 +3,12 @@ using MediatR;
 using StepLearning.Shared.Result;
 
 namespace Courses.Application.Features.Commands.Courses.PublishCourse;
-
-public class Handler : IRequestHandler<PublishCourseCommand, Result>
+public class Handler(ICoursesRepository coursesRepository) : IRequestHandler<PublishCourseCommand, Result>
 {
-    private readonly ICoursesRepository _coursesRepository;
-
-    public Handler(ICoursesRepository coursesRepository)
-    {
-        _coursesRepository = coursesRepository;
-    }
 
     public async Task<Result> Handle(PublishCourseCommand request, CancellationToken cancellationToken)
     {
-        var course = await _coursesRepository.GetCourseWithSectionsAsync(request.CourseId, cancellationToken);
+        var course = await coursesRepository.GetCourseWithSectionsAsync(request.CourseId, cancellationToken);
 
         if (course is null)
             return Result.Failure("Course not found.");
@@ -32,8 +25,10 @@ public class Handler : IRequestHandler<PublishCourseCommand, Result>
             return Result.Failure(ex.Message);
         }
 
-        await _coursesRepository.SaveChangesAsync(cancellationToken);
+        await coursesRepository.SaveChangesAsync(cancellationToken);
 
         return Result.Success();
     }
 }
+
+

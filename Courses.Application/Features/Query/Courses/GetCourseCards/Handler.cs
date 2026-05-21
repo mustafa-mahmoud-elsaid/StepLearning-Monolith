@@ -5,19 +5,12 @@ using StepLearning.Shared.Pagination;
 using StepLearning.Shared.Result;
 
 namespace Courses.Application.Features.Query.Courses.GetCourseCards;
-
-public class Handler : IRequestHandler<GetCourseCardsQuery, Result<PaginatedResult<CourseCardDto>>>
+public class Handler(ICoursesRepository coursesRepository) : IRequestHandler<GetCourseCardsQuery, Result<PaginatedResult<CourseCardDto>>>
 {
-    private readonly ICoursesRepository _coursesRepository;
-
-    public Handler(ICoursesRepository coursesRepository)
-    {
-        _coursesRepository = coursesRepository;
-    }
 
     public async Task<Result<PaginatedResult<CourseCardDto>>> Handle(GetCourseCardsQuery request, CancellationToken cancellationToken)
     {
-        var result = await _coursesRepository.GetCourseCardsAsync(
+        var result = await coursesRepository.GetCourseCardsAsync(
             request.PageNumber,
             request.PageSize,
             cancellationToken);
@@ -25,3 +18,5 @@ public class Handler : IRequestHandler<GetCourseCardsQuery, Result<PaginatedResu
         return Result<PaginatedResult<CourseCardDto>>.Success(result);
     }
 }
+
+
