@@ -1,4 +1,4 @@
-namespace Commerce.Application.Cart.Domain.Entities;
+namespace Commerce.Domain.Cart;
 
 public class Cart
 {

@@ -1,5 +1,5 @@
 using Commerce.Application.Cart.Repositories;
-using Commerce.Application.Orders.Domain.Entities;
+using Commerce.Domain.Orders;
 using Commerce.Application.Orders.Repositories;
 using MediatR;
 using StepLearning.Shared.Result;

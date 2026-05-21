@@ -1,6 +1,6 @@
-using Commerce.Application.Payment.Domain.Enums;
+using Commerce.Domain.Payment.Enums;
 
-namespace Commerce.Application.Payment.Domain.Entities;
+namespace Commerce.Domain.Payment;
 
 public class PaymentRecord
 {

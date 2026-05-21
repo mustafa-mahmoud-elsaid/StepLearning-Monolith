@@ -1,4 +1,4 @@
-using Commerce.Application.Payment.Domain.Entities;
+using Commerce.Domain.Payment;
 using Commerce.Application.Payment.Repositories;
 using Commerce.Application.Payment.ServicesInterfaces;
 using FluentValidation;
@@ -6,7 +6,7 @@ using MediatR;
 using StepLearning.Shared.Abstraction;
 using StepLearning.Shared.Result;
 
-using Commerce.Application.Orders.Domain.Enums;
+using Commerce.Domain.Orders.Enums;
 using Commerce.Application.Orders.Repositories;
 
 namespace Commerce.Application.Payment.Features.Checkout;

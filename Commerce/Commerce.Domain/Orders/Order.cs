@@ -1,6 +1,6 @@
-using Commerce.Application.Orders.Domain.Enums;
+using Commerce.Domain.Orders.Enums;
 
-namespace Commerce.Application.Orders.Domain.Entities;
+namespace Commerce.Domain.Orders;
 
 public class Order
 {

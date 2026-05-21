@@ -1,4 +1,4 @@
-using Commerce.Application.Orders.Domain.Entities;
+using Commerce.Domain.Orders;
 
 namespace Commerce.Application.Payment.ServicesInterfaces;
 

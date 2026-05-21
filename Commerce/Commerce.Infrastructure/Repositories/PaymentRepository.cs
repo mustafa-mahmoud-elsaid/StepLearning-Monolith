@@ -1,5 +1,5 @@
-using Commerce.Application.Payment.Domain.Entities;
-using Commerce.Application.Payment.Domain.Enums;
+using Commerce.Domain.Payment;
+using Commerce.Domain.Payment.Enums;
 using Commerce.Application.Payment.Repositories;
 using Commerce.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;

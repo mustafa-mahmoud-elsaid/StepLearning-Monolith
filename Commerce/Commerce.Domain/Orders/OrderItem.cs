@@ -1,4 +1,4 @@
-namespace Commerce.Application.Orders.Domain.Entities;
+namespace Commerce.Domain.Orders;
 
 public class OrderItem
 {

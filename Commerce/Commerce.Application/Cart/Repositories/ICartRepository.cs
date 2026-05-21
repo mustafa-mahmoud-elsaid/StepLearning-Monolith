@@ -1,4 +1,4 @@
-using CartEntity = Commerce.Application.Cart.Domain.Entities.Cart;
+using CartEntity = Commerce.Domain.Cart.Cart;
 
 namespace Commerce.Application.Cart.Repositories;
 

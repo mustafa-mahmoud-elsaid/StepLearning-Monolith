@@ -1,4 +1,4 @@
-using Commerce.Application.Orders.Domain.Entities;
+using Commerce.Domain.Orders;
 using Commerce.Application.Orders.Repositories;
 using Commerce.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;

@@ -1,6 +1,6 @@
-using Commerce.Application.Cart.Domain.Entities;
-using Commerce.Application.Orders.Domain.Entities;
-using Commerce.Application.Payment.Domain.Entities;
+using Commerce.Domain.Cart;
+using Commerce.Domain.Orders;
+using Commerce.Domain.Payment;
 using Microsoft.EntityFrameworkCore;
 
 namespace Commerce.Infrastructure.Data;

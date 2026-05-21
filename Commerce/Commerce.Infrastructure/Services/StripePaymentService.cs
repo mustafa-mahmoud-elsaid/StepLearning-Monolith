@@ -1,4 +1,4 @@
-using Commerce.Application.Orders.Domain.Entities;
+using Commerce.Domain.Orders;
 using Commerce.Application.Payment.ServicesInterfaces;
 using Commerce.Infrastructure.Options;
 using Microsoft.Extensions.Options;

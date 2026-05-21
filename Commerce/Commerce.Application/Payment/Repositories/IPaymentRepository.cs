@@ -1,4 +1,4 @@
-using Commerce.Application.Payment.Domain.Entities;
+using Commerce.Domain.Payment;
 
 namespace Commerce.Application.Payment.Repositories;
 

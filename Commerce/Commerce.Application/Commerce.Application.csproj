@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\StepLearning.Shared\StepLearning.Shared.csproj" />
+    <ProjectReference Include="..\Commerce.Domain\Commerce.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>
