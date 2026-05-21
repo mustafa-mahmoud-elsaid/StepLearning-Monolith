@@ -16,8 +16,7 @@ public class PaymentsController(
     [HttpPost("checkout")]
     public async Task<IActionResult> Checkout([FromBody] CheckoutRequest request, CancellationToken ct)
     {
-        var studentIdClaim = User.FindFirst("studentId");
-        if (studentIdClaim is null || !Guid.TryParse(studentIdClaim.Value, out var studentId))
+        if (!User.TryGetStudentId(out var studentId))
             return Unauthorized();
 
         var result = await mediator.Send(new CheckoutCommand(studentId, request.OrderId), ct);

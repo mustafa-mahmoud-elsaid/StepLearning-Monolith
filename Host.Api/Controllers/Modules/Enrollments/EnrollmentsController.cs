@@ -22,7 +22,7 @@ public class EnrollmentsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Enroll([FromBody] EnrollRequest request, CancellationToken ct)
     {
-        if (!Guid.TryParse(User.FindFirst("studentId")?.Value, out var studentId))
+        if (!User.TryGetStudentId(out var studentId))
             return Unauthorized("Student ID not found in token.");
 
         var dto = new EnrollStudentRequestDto(studentId, request.CourseIds, request.PaymentId, request.Status);

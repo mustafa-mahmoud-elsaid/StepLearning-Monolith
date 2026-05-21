@@ -16,7 +16,7 @@ public sealed class CartController(IMediator mediator) : ControllerBase
     [HttpPost("items")]
     public async Task<IActionResult> AddItem([FromBody] AddCartItemRequest request, CancellationToken ct)
     {
-        if (!TryGetStudentId(out var studentId))
+        if (!User.TryGetStudentId(out var studentId))
             return Unauthorized("Student ID not found in token.");
 
         var result = await mediator.Send(new AddToCartCommand(studentId, request.CourseId), ct);
@@ -29,7 +29,7 @@ public sealed class CartController(IMediator mediator) : ControllerBase
     [HttpDelete("items/{courseId:guid}")]
     public async Task<IActionResult> RemoveItem(Guid courseId, CancellationToken ct)
     {
-        if (!TryGetStudentId(out var studentId))
+        if (!User.TryGetStudentId(out var studentId))
             return Unauthorized("Student ID not found in token.");
 
         var result = await mediator.Send(new RemoveFromCartCommand(studentId, courseId), ct);
@@ -42,7 +42,7 @@ public sealed class CartController(IMediator mediator) : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetCart(CancellationToken ct)
     {
-        if (!TryGetStudentId(out var studentId))
+        if (!User.TryGetStudentId(out var studentId))
             return Unauthorized("Student ID not found in token.");
 
         var result = await mediator.Send(new GetCartQuery(studentId), ct);
@@ -55,7 +55,7 @@ public sealed class CartController(IMediator mediator) : ControllerBase
     [HttpDelete]
     public async Task<IActionResult> ClearCart(CancellationToken ct)
     {
-        if (!TryGetStudentId(out var studentId))
+        if (!User.TryGetStudentId(out var studentId))
             return Unauthorized("Student ID not found in token.");
 
         var result = await mediator.Send(new ClearCartCommand(studentId), ct);
@@ -65,10 +65,6 @@ public sealed class CartController(IMediator mediator) : ControllerBase
             : BadRequest(result.Error);
     }
 
-    private bool TryGetStudentId(out Guid studentId)
-    {
-        return Guid.TryParse(User.FindFirst("studentId")?.Value, out studentId);
-    }
 }
 
 public sealed record AddCartItemRequest(Guid CourseId);

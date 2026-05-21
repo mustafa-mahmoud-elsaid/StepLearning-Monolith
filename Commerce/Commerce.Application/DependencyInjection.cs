@@ -15,6 +15,8 @@ public static class DependencyInjection
 
         services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly);
 
+        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(StepLearning.Shared.ValidationBehavior<,>));
+
         return services;
     }
 }

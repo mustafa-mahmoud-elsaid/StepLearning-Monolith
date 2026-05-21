@@ -13,18 +13,15 @@ namespace Host.Api.Controllers.Modules.Commerce;
 [Authorize(Roles = "Student")]
 public class OrdersController(IMediator mediator) : ControllerBase
 {
-    private Guid GetStudentId()
-    {
-        var studentIdClaim = User.FindFirst("studentId");
-        if (studentIdClaim is null || !Guid.TryParse(studentIdClaim.Value, out var studentId))
-            throw new UnauthorizedAccessException("Student id not found in token");
-        return studentId;
-    }
+
 
     [HttpPost]
     public async Task<IActionResult> CreateOrder(CancellationToken cancellationToken)
     {
-        var command = new CreateOrderCommand(GetStudentId());
+        if (!User.TryGetStudentId(out var studentId))
+            return Unauthorized("Student id not found in token");
+
+        var command = new CreateOrderCommand(studentId);
         var result = await mediator.Send(command, cancellationToken);
 
         if (result.IsFailure)
@@ -36,7 +33,10 @@ public class OrdersController(IMediator mediator) : ControllerBase
     [HttpGet("{id}")]
     public async Task<IActionResult> GetOrder(Guid id, CancellationToken cancellationToken)
     {
-        var query = new GetOrderQuery(id, GetStudentId());
+        if (!User.TryGetStudentId(out var studentId))
+            return Unauthorized("Student id not found in token");
+
+        var query = new GetOrderQuery(id, studentId);
         var result = await mediator.Send(query, cancellationToken);
 
         if (result.IsFailure)
@@ -48,7 +48,10 @@ public class OrdersController(IMediator mediator) : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetOrderHistory(CancellationToken cancellationToken)
     {
-        var query = new GetOrderHistoryQuery(GetStudentId());
+        if (!User.TryGetStudentId(out var studentId))
+            return Unauthorized("Student id not found in token");
+
+        var query = new GetOrderHistoryQuery(studentId);
         var result = await mediator.Send(query, cancellationToken);
 
         if (result.IsFailure)

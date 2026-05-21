@@ -39,7 +39,7 @@ public class CoursesController : ControllerBase
     [Authorize(Roles = "Student")]
     public async Task<IActionResult> GetDetails(Guid id, CancellationToken ct)
     {
-        if (!Guid.TryParse(User.FindFirst("studentId")?.Value, out var studentId))
+        if (!User.TryGetStudentId(out var studentId))
             return Unauthorized("Student ID not found in token.");
 
         var result = await _mediator.Send(new GetCourseDetailsQuery(id, studentId), ct);
@@ -70,7 +70,7 @@ public class CoursesController : ControllerBase
     [Authorize(Roles = "Instructor")]
     public async Task<IActionResult> GetInstructorCourses([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, CancellationToken ct = default)
     {
-        if (!Guid.TryParse(User.FindFirst("instructorId")?.Value, out var instructorId))
+        if (!User.TryGetInstructorId(out var instructorId))
             return Unauthorized("Instructor ID not found in token.");
 
         var result = await _mediator.Send(new GetInstructorCoursesQuery(instructorId, pageNumber, pageSize), ct);
@@ -81,7 +81,7 @@ public class CoursesController : ControllerBase
     [Authorize(Roles = "Student")]
     public async Task<IActionResult> GetStudentCourses([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, CancellationToken ct = default)
     {
-        if (!Guid.TryParse(User.FindFirst("studentId")?.Value, out var studentId))
+        if (!User.TryGetStudentId(out var studentId))
             return Unauthorized("Student ID not found in token.");
 
         var result = await _mediator.Send(new GetStudentCoursesQuery(studentId, pageNumber, pageSize), ct);
@@ -94,7 +94,7 @@ public class CoursesController : ControllerBase
     [Authorize(Roles = "Instructor")]
     public async Task<IActionResult> Create([FromBody] CourseCreateRequest request, CancellationToken ct)
     {
-        if (!Guid.TryParse(User.FindFirst("instructorId")?.Value, out var instructorId))
+        if (!User.TryGetInstructorId(out var instructorId))
             return Unauthorized("Instructor ID not found in token.");
 
         var dto = new CourseCreateDto(instructorId, request.Title, request.Description);
@@ -114,7 +114,7 @@ public class CoursesController : ControllerBase
     [Authorize(Roles = "Instructor")]
     public async Task<IActionResult> Publish(Guid id, CancellationToken ct)
     {
-        if (!Guid.TryParse(User.FindFirst("instructorId")?.Value, out var instructorId))
+        if (!User.TryGetInstructorId(out var instructorId))
             return Unauthorized("Instructor ID not found in token.");
 
         var result = await _mediator.Send(new PublishCourseCommand(id, instructorId), ct);

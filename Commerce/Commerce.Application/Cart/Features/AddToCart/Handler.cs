@@ -19,7 +19,7 @@ internal sealed class Handler(
         var cart = await cartRepository.GetByStudentIdAsync(request.StudentId, cancellationToken);
         var isNewCart = cart is null;
 
-        cart ??= Domain.Entities.Cart.Create(request.StudentId);
+        cart ??= Domain.Cart.Cart.Create(request.StudentId);
 
         try
         {

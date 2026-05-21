@@ -5,7 +5,7 @@ using StepLearning.Shared.Result;
 
 namespace Identity.Application.Features.Register.Instructor;
 
-public class Handler : IRequestHandler<InstructorRegisterCommand, Result<LoginResponse>>
+internal sealed class Handler : IRequestHandler<InstructorRegisterCommand, Result<LoginResponse>>
 {
     private readonly IGenericRepository<Domain.Entities.Instructor> _repository;
     private readonly UserRegistrationService _registrationService;
