@@ -1,4 +1,4 @@
-﻿using Courses.Application.RepositoriesContracts;
+using Courses.Application.RepositoriesContracts;
 using Courses.Domain.Entities;
 using MediatR;
 using StepLearning.Shared.Abstraction;
@@ -13,10 +13,10 @@ public class CreateCourseHandler(ICoursesRepository coursesRepository, IInstruct
 
     public async Task<Result<Guid>> Handle(CreateCourseCommand request, CancellationToken cancellationToken)
     {
-        if (await _instructorService.Exists(request.dto.InstructorId, cancellationToken))
-            return Result<Guid>.Failure("Can not create the course, no intructor with this id");
+        if (await _instructorService.Exists(request.Details.InstructorId, cancellationToken))
+            return Result<Guid>.Failure("Cannot create the course. No instructor found with this ID.");
 
-        var course = Course.Create(request.dto.Title, request.dto.Description, request.dto.InstructorId);
+        var course = Course.Create(request.Details.Title, request.Details.Description, request.Details.InstructorId);
 
         var courseId = await _coursesRepository.CreateCourseAsync(course, cancellationToken);
 

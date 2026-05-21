@@ -24,7 +24,7 @@ public class Handler : IRequestHandler<UpdateCourseCommand, Result>
 
         try
         {
-            course.Update(request.Dto.Title, request.Dto.Description, request.Dto.Price);
+            course.Update(request.Details.Title, request.Details.Description, request.Details.Price);
         }
         catch (ArgumentException ex)
         {

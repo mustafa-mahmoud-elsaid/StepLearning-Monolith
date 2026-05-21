@@ -15,12 +15,12 @@ internal sealed class Handler(
 {
     public async Task<Result> Handle(EnrollStudentCommand request, CancellationToken cancellationToken)
     {
-        var dto = request.dto;
+        var dto = request.Details;
 
         var studentEmail = await studentService.GetEmail(dto.StudentId, cancellationToken); 
 
         if (string.IsNullOrWhiteSpace(studentEmail))
-            return Result.Failure("Failed to enroll, student not exists");
+            return Result.Failure("Failed to enroll. Student not found.");
 
         var enrollmentsToCreate = new List<(Domain.Entities.Enrollment Enrollment, string CourseName, string? ThumbnailUrl)>();
 
@@ -28,7 +28,7 @@ internal sealed class Handler(
         {
             var courseSnapshot = await courseService.GetSnapshot(courseId, cancellationToken);
             if (courseSnapshot is null)
-                return Result.Failure($"Failed to enroll, course {courseId} not exists or is not available for purchase");
+                return Result.Failure($"Failed to enroll, Course {courseId} not found or is not available for purchase.");
 
             var isEnrolled = await enrollmentRepository.IsEnrolled(dto.StudentId, courseId, cancellationToken);
             if (isEnrolled)

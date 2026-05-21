@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+using FluentValidation;
 using Identity.Application.Domain.DTO;
 
 namespace Identity.Application.Features.Login;
@@ -7,13 +7,13 @@ public sealed class Validator : AbstractValidator<LoginCommand>
 {
     public Validator()
     {
-        RuleFor(x => x.dto.Email)
+        RuleFor(x => x.Credentials.Email)
             .NotEmpty()
             //.MaximumLength(256)
             .EmailAddress()
             .WithMessage("Invalid email format");
 
-        RuleFor(x => x.dto.Password)
+        RuleFor(x => x.Credentials.Password)
             .NotEmpty();
 
 

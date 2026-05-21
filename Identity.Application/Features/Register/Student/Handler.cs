@@ -20,7 +20,7 @@ public sealed class Handler(
 
     public async Task<Result<LoginResponse>> Handle(StudentRegisterCommand request, CancellationToken cancellationToken)
     {
-        var dto = request.dto;
+        var dto = request.Credentials;
 
         var user = await _userManager.FindByEmailAsync(dto.Email);
 

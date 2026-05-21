@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+using FluentValidation;
 
 namespace Courses.Application.Features.Create.Courses;
 
@@ -6,14 +6,14 @@ internal sealed class CreateCourseCommandValidator : AbstractValidator<CreateCou
 {
     public CreateCourseCommandValidator()
     {
-        RuleFor(x => x.dto.Title)
+        RuleFor(x => x.Details.Title)
             .NotEmpty()
             .MaximumLength(250);
 
-        RuleFor(x => x.dto.Description)
+        RuleFor(x => x.Details.Description)
             .MaximumLength(1000);
 
-        RuleFor(x => x.dto.InstructorId)
+        RuleFor(x => x.Details.InstructorId)
             .NotEmpty();
     }
 }

@@ -60,7 +60,7 @@ internal class TokenService : ITokenService
 
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Key"] ?? throw new InvalidOperationException("No key configured")));
 
-        var signingcreds = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+        var signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
 
         var jwtSecurityToken = new JwtSecurityToken(
@@ -68,7 +68,7 @@ internal class TokenService : ITokenService
             audience: _configuration["JWT:Audience"],
             claims: claims,
             expires: DateTime.UtcNow.AddMinutes(_configuration.GetValue<int>("JWT:DurationInMinutes", 15)),
-            signingCredentials: signingcreds
+            signingCredentials: signingCredentials
             );
 
         return new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
@@ -78,7 +78,7 @@ internal class TokenService : ITokenService
     public async Task<Result<string>> GenerateRefreshToken(ApplicationUser user, CancellationToken cancellationToken = default)
     {
         if (user is null)
-            return Result<string>.Failure("user can not be null");
+            return Result<string>.Failure("User cannot be null.");
 
         if(await _userManager.FindByIdAsync(user.Id.ToString()) is null)
             return Result<string>.Failure("invalid user");
@@ -86,9 +86,9 @@ internal class TokenService : ITokenService
 
         var randomNumber = new byte[64];
 
-        var rnd = RandomNumberGenerator.Create();
+        var rng = RandomNumberGenerator.Create();
 
-        rnd.GetBytes(randomNumber);
+        rng.GetBytes(randomNumber);
 
         var token = Convert.ToBase64String(randomNumber);
         RefreshToken refToken;

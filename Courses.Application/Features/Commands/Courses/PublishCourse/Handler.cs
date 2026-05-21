@@ -21,7 +21,7 @@ public class Handler : IRequestHandler<PublishCourseCommand, Result>
             return Result.Failure("Course not found.");
 
         if(request.InstructorId != course.InstructorId)
-            return Result.Failure("intructor not owns this course.");
+            return Result.Failure("You are not the owner of this course.");
 
         try
         {

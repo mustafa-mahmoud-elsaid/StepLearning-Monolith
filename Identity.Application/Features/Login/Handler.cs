@@ -1,4 +1,4 @@
-﻿using Identity.Application.Domain.DTO;
+using Identity.Application.Domain.DTO;
 using Identity.Application.Infrastructure;
 using Identity.Application.Infrastructure.JWT;
 using MediatR;
@@ -17,11 +17,11 @@ public sealed class Handler(
     private readonly ITokenService _tokenService = tokenService;
     public async Task<Result<LoginResponse>> Handle(LoginCommand request, CancellationToken cancellationToken)
     {
-        var user = await _userManager.FindByEmailAsync(request.dto.Email);
+        var user = await _userManager.FindByEmailAsync(request.Credentials.Email);
         if (user is null)
             return Result<LoginResponse>.Failure("Invalid email or password");
 
-        var result = await _signInManager.CheckPasswordSignInAsync(user!, request.dto.Password, false);
+        var result = await _signInManager.CheckPasswordSignInAsync(user!, request.Credentials.Password, false);
 
         if (!result.Succeeded)
             return Result<LoginResponse>.Failure("Invalid email or password");

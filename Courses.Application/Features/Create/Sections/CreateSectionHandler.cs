@@ -1,4 +1,4 @@
-﻿using Courses.Application.RepositoriesContracts;
+using Courses.Application.RepositoriesContracts;
 using Courses.Application.Utilities;
 using Courses.Domain.Entities;
 using MediatR;
@@ -19,16 +19,16 @@ public class CreateSectionHandler : IRequestHandler<CreateSectionCommand, Result
         // TODO: check course id
 
 
-        var lastSectionOrder = await _sectionsRepository.GetLastDisplayOrderAsync<Section>(s => s.Id == request.dto.CourseId)!;
+        var lastSectionOrder = await _sectionsRepository.GetLastDisplayOrderAsync<Section>(s => s.Id == request.Details.CourseId)!;
 
         var section = new Section
         {
             Id = Guid.NewGuid(),
-            Title = request.dto.Title,
-            CourseId = request.dto.CourseId
+            Title = request.Details.Title,
+            CourseId = request.Details.CourseId
         };
 
-        section.DisplayOrder = Helper.GetRightOrder(lastSectionOrder);
+        section.DisplayOrder = DisplayOrderCalculator.GetNext(lastSectionOrder);
 
         var sectionId = await _sectionsRepository.CreateSectionAsync(section, cancellationToken);
 

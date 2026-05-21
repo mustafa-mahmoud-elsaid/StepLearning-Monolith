@@ -1,4 +1,4 @@
-﻿using Courses.Application.RepositoriesContracts;
+using Courses.Application.RepositoriesContracts;
 using Courses.Application.Utilities;
 using Courses.Domain.Entities;
 using MediatR;
@@ -22,15 +22,15 @@ public class CreateVideoItemHandler : IRequestHandler<CreateVideoItemCommand, Re
         var video = new VideoItem
         {
             Id = Guid.NewGuid(),
-            Title = request.dto.Title,
-            VideoUrl = request.dto.VideoUrl,
-            Duration = request.dto.Duration, // for now
-            SectionId = request.dto.SectionId
+            Title = request.Details.Title,
+            VideoUrl = request.Details.VideoUrl,
+            Duration = request.Details.Duration, // for now
+            SectionId = request.Details.SectionId
         };
 
         var lastItemOrder = await _sectionsRepository.GetLastDisplayOrderAsync<SectionItem>(s => s.Id == video.SectionId);
 
-        video.DisplayOrder = Helper.GetRightOrder(lastItemOrder);
+        video.DisplayOrder = DisplayOrderCalculator.GetNext(lastItemOrder);
 
         await _sectionsRepository.CreateVideoItemAsync(video, cancellationToken);
 
@@ -52,14 +52,14 @@ public class CreatePdfItemHandler : IRequestHandler<CreatePdfItemCommand, Result
         var pdf = new PdfItem
         {
             Id = Guid.NewGuid(),
-            Title = request.dto.Title,
-            FileUrl = request.dto.PdfUrl,
-            SectionId = request.dto.SectionId
+            Title = request.Details.Title,
+            FileUrl = request.Details.PdfUrl,
+            SectionId = request.Details.SectionId
         };
 
         var lastSectionItemOrder = await _sectionsRepository.GetLastDisplayOrderAsync<SectionItem>(s => s.Id == pdf.SectionId);
 
-        pdf.DisplayOrder = Helper.GetRightOrder(lastSectionItemOrder);
+        pdf.DisplayOrder = DisplayOrderCalculator.GetNext(lastSectionItemOrder);
 
         await _sectionsRepository.CreatePdfItemAsync(pdf, cancellationToken);
 

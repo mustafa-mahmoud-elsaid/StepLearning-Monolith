@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+using FluentValidation;
 
 namespace Identity.Application.Features.Register.Student;
 
@@ -6,11 +6,11 @@ public sealed class Validator : AbstractValidator<StudentRegisterCommand>
 {
     public Validator()
     {
-        RuleFor(x => x.dto.FullName)
+        RuleFor(x => x.Credentials.FullName)
             .NotEmpty()
             .MaximumLength(100);
 
-        RuleFor(x => x.dto.ProfilePictureUrl)
+        RuleFor(x => x.Credentials.ProfilePictureUrl)
             .MaximumLength(500)
             .Must(uri =>
                 string.IsNullOrWhiteSpace(uri) ||
@@ -18,7 +18,7 @@ public sealed class Validator : AbstractValidator<StudentRegisterCommand>
             .WithMessage("Profile picture URL is invalid.");
 
 
-        RuleFor(x => x.dto.Email)
+        RuleFor(x => x.Credentials.Email)
             .NotEmpty()
             .MaximumLength(256)
             .EmailAddress()
@@ -26,7 +26,7 @@ public sealed class Validator : AbstractValidator<StudentRegisterCommand>
 
 
 
-        RuleFor(x => x.dto.Password)
+        RuleFor(x => x.Credentials.Password)
             .NotEmpty()
             .MinimumLength(8)
             .Matches("[A-Z]")

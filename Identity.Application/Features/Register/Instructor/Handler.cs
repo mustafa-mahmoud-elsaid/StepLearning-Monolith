@@ -23,12 +23,12 @@ public class Handler : IRequestHandler<InstructorRegisterCommand, Result<LoginRe
     }
     public async Task<Result<LoginResponse>> Handle(InstructorRegisterCommand request, CancellationToken cancellationToken)
     {
-        var user = await _userManager.FindByEmailAsync(request.dto.Email);
+        var user = await _userManager.FindByEmailAsync(request.Credentials.Email);
 
         if (user is not null)
             return Result<LoginResponse>.Failure("Email already exists");
 
-        var dto = request.dto;
+        var dto = request.Credentials;
 
         try
         {

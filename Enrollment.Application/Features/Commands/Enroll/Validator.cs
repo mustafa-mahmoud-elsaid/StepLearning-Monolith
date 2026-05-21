@@ -6,19 +6,19 @@ internal class Validator : AbstractValidator<EnrollStudentCommand>
 {
     public Validator()
     {
-        RuleFor(e => e.dto.CourseIds)
+        RuleFor(e => e.Details.CourseIds)
             .NotEmpty()
             .WithMessage("Course Ids must not be empty");
 
-        RuleFor(e => e.dto.StudentId)
+        RuleFor(e => e.Details.StudentId)
             .NotEmpty()
             .WithMessage("Student Id must not be empty");
 
-        RuleFor(e => e.dto.PaymentId)
+        RuleFor(e => e.Details.PaymentId)
             .NotEmpty()
             .WithMessage("Payment Id must not be empty");
 
-        RuleFor(e => e.dto.Status)
+        RuleFor(e => e.Details.Status)
             .NotNull()
             .IsInEnum();
     }

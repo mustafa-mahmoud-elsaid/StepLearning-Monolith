@@ -1,4 +1,4 @@
-﻿using Courses.Application.Utilities;
+using Courses.Application.Utilities;
 using FluentValidation;
 
 namespace Courses.Application.Features.Create.Sections;
@@ -7,19 +7,19 @@ internal class CreateVideoItemValidator : AbstractValidator<CreateVideoItemComma
 {
     public CreateVideoItemValidator()
     {
-        RuleFor(x => x.dto.Title)
+        RuleFor(x => x.Details.Title)
             .NotEmpty()
             .MaximumLength(200);
 
-        RuleFor(x => x.dto.Duration)
+        RuleFor(x => x.Details.Duration)
             .NotEmpty();
 
-        RuleFor(x => x.dto.SectionId)
+        RuleFor(x => x.Details.SectionId)
             .NotEmpty();
 
-        RuleFor(x => x.dto.VideoUrl)
+        RuleFor(x => x.Details.VideoUrl)
             .NotEmpty()
-            .Must(Helper.BeValidUrl)
+            .Must(UrlValidator.BeValidUrl)
             .WithMessage("Video Url is not valid.");
     }
 }
@@ -28,16 +28,16 @@ internal class CreatePdfItemValidator : AbstractValidator<CreatePdfItemCommand>
 {
     public CreatePdfItemValidator()
     {
-        RuleFor(x => x.dto.Title)
+        RuleFor(x => x.Details.Title)
             .NotEmpty()
             .MaximumLength(200);
 
-        RuleFor(x => x.dto.SectionId)
+        RuleFor(x => x.Details.SectionId)
             .NotEmpty();
 
-        RuleFor(x => x.dto.PdfUrl)
+        RuleFor(x => x.Details.PdfUrl)
             .NotEmpty()
-            .Must(Helper.BeValidUrl)
+            .Must(UrlValidator.BeValidUrl)
             .WithMessage("Pdf Url is not valid.");
     }
 }
