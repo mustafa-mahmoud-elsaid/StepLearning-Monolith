@@ -45,18 +45,21 @@ internal sealed class Handler(
             }
         }
 
-        foreach (var enrollment in enrollmentsToCreate)
+        if (enrollmentsToCreate.Any())
         {
-            await enrollmentRepository.AddEnrollment(enrollment, cancellationToken);
+            await enrollmentRepository.AddEnrollments(enrollmentsToCreate, cancellationToken);
 
-            await integrationEventPublisher.PublishAsync(
-                new EnrollmentCompletedEvent(
-                    enrollment.Id,
-                    enrollment.StudentId,
-                    enrollment.CourseId,
-                    enrollment.PaymentId,
-                    DateTime.UtcNow),
-                cancellationToken);
+            foreach (var enrollment in enrollmentsToCreate)
+            {
+                await integrationEventPublisher.PublishAsync(
+                    new EnrollmentCompletedEvent(
+                        enrollment.Id,
+                        enrollment.StudentId,
+                        enrollment.CourseId,
+                        enrollment.PaymentId,
+                        DateTime.UtcNow),
+                    cancellationToken);
+            }
         }
 
         return Result.Success();
