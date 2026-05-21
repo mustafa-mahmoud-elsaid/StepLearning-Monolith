@@ -1,6 +1,7 @@
 using Commerce.Application.Payment.Domain.Entities;
 using Commerce.Application.Payment.Repositories;
 using Commerce.Application.Payment.ServicesInterfaces;
+using FluentValidation;
 using MediatR;
 using StepLearning.Shared.Abstraction;
 using StepLearning.Shared.Result;
@@ -18,12 +19,6 @@ internal sealed class Handler(
 {
     public async Task<Result<string>> Handle(CheckoutCommand request, CancellationToken cancellationToken)
     {
-        if (request.StudentId == Guid.Empty)
-            return Result<string>.Failure("Student id must not be empty");
-
-        if (request.OrderId == Guid.Empty)
-            return Result<string>.Failure("Order id must not be empty");
-
         var validStudent = await studentService.Exists(request.StudentId, cancellationToken);
 
         if (!validStudent)

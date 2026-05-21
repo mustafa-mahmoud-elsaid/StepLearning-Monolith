@@ -11,12 +11,6 @@ internal sealed class Handler(
 {
     public async Task<Result> Handle(AddToCartCommand request, CancellationToken cancellationToken)
     {
-        if (request.StudentId == Guid.Empty)
-            return Result.Failure("Student id must not be empty");
-
-        if (request.CourseId == Guid.Empty)
-            return Result.Failure("Course id must not be empty");
-
         var courseSnapshot = await courseService.GetSnapshot(request.CourseId, cancellationToken);
 
         if (courseSnapshot is null)

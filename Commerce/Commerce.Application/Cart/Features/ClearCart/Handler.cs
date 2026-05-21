@@ -8,9 +8,6 @@ internal sealed class Handler(ICartRepository cartRepository) : IRequestHandler<
 {
     public async Task<Result> Handle(ClearCartCommand request, CancellationToken cancellationToken)
     {
-        if (request.StudentId == Guid.Empty)
-            return Result.Failure("Student id must not be empty");
-
         var cart = await cartRepository.GetByStudentIdAsync(request.StudentId, cancellationToken);
 
         if (cart is null)

@@ -12,9 +12,6 @@ internal sealed class Handler(
 {
     public async Task<Result<Guid>> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
     {
-        if (request.StudentId == Guid.Empty)
-            return Result<Guid>.Failure("Student id must not be empty");
-
         var cart = await cartRepository.GetByStudentIdAsync(request.StudentId, cancellationToken);
 
         if (cart is null || !cart.Items.Any())
