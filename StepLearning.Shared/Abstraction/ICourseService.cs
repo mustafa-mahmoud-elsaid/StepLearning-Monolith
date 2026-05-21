@@ -1,4 +1,4 @@
-﻿namespace StepLearning.Shared.Abstraction;
+namespace StepLearning.Shared.Abstraction;
 
 public interface ICourseService
 {
@@ -7,4 +7,4 @@ public interface ICourseService
     Task<CourseSnapshot?> GetSnapshot(Guid courseId, CancellationToken ct = default);
 }
 
-public sealed record CourseSnapshot(Guid CourseId, string Title, decimal Price);
+public sealed record CourseSnapshot(Guid CourseId, string Title, decimal Price, string? ThumbnailUrl);

@@ -244,7 +244,7 @@ internal sealed class CoursesRepository : ICoursesRepository
         return await _dbContext.Courses
             .AsNoTracking()
             .Where(c => c.Id == courseId && c.IsPublished && !c.IsDeleted && c.Price.HasValue)
-            .Select(c => new CourseSnapshot(c.Id, c.Title, c.Price!.Value))
+            .Select(c => new CourseSnapshot(c.Id, c.Title, c.Price!.Value, c.ThumbnailUrl))
             .FirstOrDefaultAsync(ct);
     }
 
