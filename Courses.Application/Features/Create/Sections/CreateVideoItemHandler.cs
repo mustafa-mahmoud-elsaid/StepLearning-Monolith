@@ -6,7 +6,7 @@ using StepLearning.Shared.Result;
 
 namespace Courses.Application.Features.Create.Sections;
 
-public class CreateVideoItemHandler : IRequestHandler<CreateVideoItemCommand, Result<Guid>>
+internal sealed class CreateVideoItemHandler : IRequestHandler<CreateVideoItemCommand, Result<Guid>>
 {
     private readonly ISectionsRepository _sectionsRepository;
 

@@ -5,7 +5,7 @@ using StepLearning.Shared.Abstraction;
 using StepLearning.Shared.Result;
 
 namespace Courses.Application.Features.Query.Courses.GetCourseDetails;
-public class Handler(ICoursesRepository coursesRepository, IEnrollmentService enrollmentService) : IRequestHandler<GetCourseDetailsQuery, Result<CourseDetailsDto>>
+internal sealed class Handler(ICoursesRepository coursesRepository, IEnrollmentService enrollmentService) : IRequestHandler<GetCourseDetailsQuery, Result<CourseDetailsDto>>
 {
 
     public async Task<Result<CourseDetailsDto>> Handle(GetCourseDetailsQuery request, CancellationToken cancellationToken)

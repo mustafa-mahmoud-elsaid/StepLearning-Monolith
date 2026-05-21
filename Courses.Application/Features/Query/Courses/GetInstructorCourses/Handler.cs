@@ -5,7 +5,7 @@ using StepLearning.Shared.Pagination;
 using StepLearning.Shared.Result;
 
 namespace Courses.Application.Features.Query.Courses.GetInstructorCourses;
-public class Handler(ICoursesRepository coursesRepository) : IRequestHandler<GetInstructorCoursesQuery, Result<PaginatedResult<InstructorCourseDto>>>
+internal sealed class Handler(ICoursesRepository coursesRepository) : IRequestHandler<GetInstructorCoursesQuery, Result<PaginatedResult<InstructorCourseDto>>>
 {
 
     public async Task<Result<PaginatedResult<InstructorCourseDto>>> Handle(GetInstructorCoursesQuery request, CancellationToken cancellationToken)

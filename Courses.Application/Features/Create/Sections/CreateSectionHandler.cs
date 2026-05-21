@@ -6,7 +6,7 @@ using StepLearning.Shared.Result;
 
 namespace Courses.Application.Features.Create.Sections;
 
-public class CreateSectionHandler : IRequestHandler<CreateSectionCommand, Result<Guid>>
+internal sealed class CreateSectionHandler : IRequestHandler<CreateSectionCommand, Result<Guid>>
 {
     private readonly ISectionsRepository _sectionsRepository;
     private readonly ICoursesRepository _coursesRepository;

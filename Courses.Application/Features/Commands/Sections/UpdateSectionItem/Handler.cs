@@ -3,7 +3,7 @@ using MediatR;
 using StepLearning.Shared.Result;
 
 namespace Courses.Application.Features.Commands.Sections.UpdateSectionItem;
-public class Handler(ISectionsRepository sectionsRepository) : IRequestHandler<UpdateSectionItemCommand, Result>
+internal sealed class Handler(ISectionsRepository sectionsRepository) : IRequestHandler<UpdateSectionItemCommand, Result>
 {
 
     public async Task<Result> Handle(UpdateSectionItemCommand request, CancellationToken cancellationToken)

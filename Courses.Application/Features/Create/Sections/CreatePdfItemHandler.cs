@@ -6,7 +6,7 @@ using StepLearning.Shared.Result;
 
 namespace Courses.Application.Features.Create.Sections;
 
-public class CreatePdfItemHandler : IRequestHandler<CreatePdfItemCommand, Result<Guid>>
+internal sealed class CreatePdfItemHandler : IRequestHandler<CreatePdfItemCommand, Result<Guid>>
 {
     private readonly ISectionsRepository _sectionsRepository;
 

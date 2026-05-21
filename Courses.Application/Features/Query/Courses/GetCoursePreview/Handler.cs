@@ -4,7 +4,7 @@ using MediatR;
 using StepLearning.Shared.Result;
 
 namespace Courses.Application.Features.Query.Courses.GetCoursePreview;
-public class Handler(ICoursesRepository coursesRepository) : IRequestHandler<GetCoursePreviewQuery, Result<CoursePreviewDto>>
+internal sealed class Handler(ICoursesRepository coursesRepository) : IRequestHandler<GetCoursePreviewQuery, Result<CoursePreviewDto>>
 {
 
     public async Task<Result<CoursePreviewDto>> Handle(GetCoursePreviewQuery request, CancellationToken cancellationToken)

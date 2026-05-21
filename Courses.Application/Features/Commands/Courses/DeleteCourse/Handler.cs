@@ -3,7 +3,7 @@ using MediatR;
 using StepLearning.Shared.Result;
 
 namespace Courses.Application.Features.Commands.Courses.DeleteCourse;
-public class Handler(ICoursesRepository coursesRepository) : IRequestHandler<DeleteCourseCommand, Result>
+internal sealed class Handler(ICoursesRepository coursesRepository) : IRequestHandler<DeleteCourseCommand, Result>
 {
 
     public async Task<Result> Handle(DeleteCourseCommand request, CancellationToken cancellationToken)

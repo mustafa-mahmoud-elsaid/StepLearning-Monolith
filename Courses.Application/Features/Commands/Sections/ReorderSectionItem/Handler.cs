@@ -4,7 +4,7 @@ using MediatR;
 using StepLearning.Shared.Result;
 
 namespace Courses.Application.Features.Commands.Sections.ReorderSectionItem;
-public class Handler(ISectionsRepository sectionsRepository) : IRequestHandler<ReorderSectionItemCommand, Result>
+internal sealed class Handler(ISectionsRepository sectionsRepository) : IRequestHandler<ReorderSectionItemCommand, Result>
 {
 
     public async Task<Result> Handle(ReorderSectionItemCommand request, CancellationToken cancellationToken)

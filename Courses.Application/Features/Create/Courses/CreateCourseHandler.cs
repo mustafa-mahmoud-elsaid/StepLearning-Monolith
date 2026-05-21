@@ -6,7 +6,7 @@ using StepLearning.Shared.Result;
 
 namespace Courses.Application.Features.Create.Courses;
 
-public class CreateCourseHandler(ICoursesRepository coursesRepository, IInstructorService instructorService) : IRequestHandler<CreateCourseCommand, Result<Guid>>
+internal sealed class CreateCourseHandler(ICoursesRepository coursesRepository, IInstructorService instructorService) : IRequestHandler<CreateCourseCommand, Result<Guid>>
 {
     private readonly ICoursesRepository _coursesRepository = coursesRepository;
     private readonly IInstructorService _instructorService = instructorService;
