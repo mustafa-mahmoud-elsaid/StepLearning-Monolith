@@ -19,7 +19,7 @@ public sealed class PaymentSucceededConsumer(
         var command = new EnrollStudentCommand(
             new EnrollStudentRequestDto(
                 message.StudentId,
-                message.CourseId,
+                message.CourseIds,
                 message.PaymentId,
                 EnrollmentStatus.Active));
 
@@ -28,10 +28,9 @@ public sealed class PaymentSucceededConsumer(
         if (result.IsFailure)
         {
             logger.LogWarning(
-                "Payment succeeded event was consumed but enrollment was not created. PaymentId: {PaymentId}, StudentId: {StudentId}, CourseId: {CourseId}, Reason: {Reason}",
+                "Payment succeeded event was consumed but enrollment was not created. PaymentId: {PaymentId}, StudentId: {StudentId}, Reason: {Reason}",
                 message.PaymentId,
                 message.StudentId,
-                message.CourseId,
                 result.Error);
         }
     }

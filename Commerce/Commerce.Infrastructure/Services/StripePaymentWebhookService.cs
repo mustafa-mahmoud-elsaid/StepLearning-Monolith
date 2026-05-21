@@ -86,12 +86,10 @@ internal sealed class StripePaymentWebhookService(
             order.MarkAsPaid(payment.Id);
             await orderRepository.SaveChangesAsync(cancellationToken);
 
-            foreach (var item in order.Items)
-            {
-                await integrationEventPublisher.PublishAsync(
-                    new PaymentSucceededEvent(payment.StudentId, item.CourseId, payment.Id),
-                    cancellationToken);
-            }
+            var courseIds = order.Items.Select(x => x.CourseId).ToList();
+            await integrationEventPublisher.PublishAsync(
+                new PaymentSucceededEvent(payment.StudentId, payment.Id, courseIds),
+                cancellationToken);
         }
         else
         {

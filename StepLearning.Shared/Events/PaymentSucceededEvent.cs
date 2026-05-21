@@ -1,3 +1,3 @@
 namespace StepLearning.Shared.Events;
 
-public record PaymentSucceededEvent(Guid StudentId, Guid CourseId, Guid PaymentId);
+public record PaymentSucceededEvent(Guid StudentId, Guid PaymentId, List<Guid> CourseIds);

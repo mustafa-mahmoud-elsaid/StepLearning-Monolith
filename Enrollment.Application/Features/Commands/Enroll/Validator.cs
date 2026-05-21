@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+using FluentValidation;
 
 namespace Enrollment.Application.Features.Commands.Enroll;
 
@@ -6,9 +6,9 @@ internal class Validator : AbstractValidator<EnrollStudentCommand>
 {
     public Validator()
     {
-        RuleFor(e => e.dto.CourseId)
+        RuleFor(e => e.dto.CourseIds)
             .NotEmpty()
-            .WithMessage("Course Id must not be empty");
+            .WithMessage("Course Ids must not be empty");
 
         RuleFor(e => e.dto.StudentId)
             .NotEmpty()

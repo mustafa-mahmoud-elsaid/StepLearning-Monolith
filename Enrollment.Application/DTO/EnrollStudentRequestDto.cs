@@ -1,5 +1,5 @@
-﻿using Enrollment.Application.Domain.Enums;
+using Enrollment.Application.Domain.Enums;
 
 namespace Enrollment.Application.DTO;
 
-public record EnrollStudentRequestDto(Guid StudentId, Guid CourseId, Guid PaymentId, EnrollmentStatus Status);
+public record EnrollStudentRequestDto(Guid StudentId, List<Guid> CourseIds, Guid PaymentId, EnrollmentStatus Status);
