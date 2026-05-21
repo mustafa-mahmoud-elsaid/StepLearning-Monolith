@@ -49,8 +49,7 @@ internal sealed class Handler(
             paymentUrl = await paymentService.CreatePaymentUrl(
                 payment.Id,
                 payment.StudentId,
-                payment.OrderId,
-                payment.Amount);
+                order);
         }
         catch (InvalidOperationException ex)
         {

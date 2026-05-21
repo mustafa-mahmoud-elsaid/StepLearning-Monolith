@@ -1,3 +1,4 @@
+using Commerce.Application.Orders.Domain.Entities;
 using Commerce.Application.Payment.ServicesInterfaces;
 using Commerce.Infrastructure.Options;
 using Microsoft.Extensions.Options;
@@ -7,7 +8,7 @@ namespace Commerce.Infrastructure.Services;
 
 internal class StripePaymentService(IOptions<StripeOptions> stripeOptions) : IPaymentService
 {
-    public async Task<string> CreatePaymentUrl(Guid paymentId, Guid userId, Guid courseId, decimal amount)
+    public async Task<string> CreatePaymentUrl(Guid paymentId, Guid userId, Order order)
     {
         var optionsValue = stripeOptions.Value;
 
@@ -17,25 +18,22 @@ internal class StripePaymentService(IOptions<StripeOptions> stripeOptions) : IPa
             Metadata = new()
             {
                 ["paymentId"] = paymentId.ToString(),
-                ["courseId"] = courseId.ToString(),
+                ["orderId"] = order.Id.ToString(),
                 ["userId"] = userId.ToString()
             },
-            LineItems = new()
+            LineItems = order.Items.Select(item => new SessionLineItemOptions
             {
-                new SessionLineItemOptions
+                PriceData = new SessionLineItemPriceDataOptions
                 {
-                    PriceData = new()
+                    Currency = optionsValue.Currency,
+                    UnitAmount = Convert.ToInt64(decimal.Round(item.Price * 100, 0)),
+                    ProductData = new SessionLineItemPriceDataProductDataOptions
                     {
-                        Currency = optionsValue.Currency,
-                        UnitAmount = Convert.ToInt64(decimal.Round(amount * 100, 0)),
-                        ProductData = new()
-                        {
-                            Name = "Course enrollment"
-                        }
-                    },
-                    Quantity = 1
-                }
-            },
+                        Name = item.CourseTitle
+                    }
+                },
+                Quantity = 1
+            }).ToList(),
             SuccessUrl = optionsValue.SuccessUrl,
             CancelUrl = optionsValue.CancelUrl
         };
