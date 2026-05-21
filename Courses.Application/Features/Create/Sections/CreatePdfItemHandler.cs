@@ -20,17 +20,10 @@ public class CreatePdfItemHandler : IRequestHandler<CreatePdfItemCommand, Result
         if (section is null)
             return Result<Guid>.Failure("Section not found.");
 
-        var pdf = new PdfItem
-        {
-            Id = Guid.NewGuid(),
-            Title = request.Details.Title,
-            FileUrl = request.Details.PdfUrl,
-            SectionId = request.Details.SectionId
-        };
+        var lastSectionItemOrder = await _sectionsRepository.GetLastDisplayOrderAsync<SectionItem>(s => s.SectionId == request.Details.SectionId);
+        var nextOrder = DisplayOrderCalculator.GetNext(lastSectionItemOrder);
 
-        var lastSectionItemOrder = await _sectionsRepository.GetLastDisplayOrderAsync<SectionItem>(s => s.Id == pdf.SectionId);
-
-        pdf.DisplayOrder = DisplayOrderCalculator.GetNext(lastSectionItemOrder);
+        var pdf = PdfItem.Create(request.Details.Title, request.Details.PdfUrl, request.Details.SectionId, nextOrder);
 
         await _sectionsRepository.CreatePdfItemAsync(pdf, cancellationToken);
 

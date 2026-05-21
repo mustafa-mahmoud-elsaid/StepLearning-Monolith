@@ -20,18 +20,10 @@ public class CreateVideoItemHandler : IRequestHandler<CreateVideoItemCommand, Re
         if (section is null)
             return Result<Guid>.Failure("Section not found.");
 
-        var video = new VideoItem
-        {
-            Id = Guid.NewGuid(),
-            Title = request.Details.Title,
-            VideoUrl = request.Details.VideoUrl,
-            Duration = request.Details.Duration, // for now
-            SectionId = request.Details.SectionId
-        };
+        var lastItemOrder = await _sectionsRepository.GetLastDisplayOrderAsync<SectionItem>(s => s.SectionId == request.Details.SectionId);
+        var nextOrder = DisplayOrderCalculator.GetNext(lastItemOrder);
 
-        var lastItemOrder = await _sectionsRepository.GetLastDisplayOrderAsync<SectionItem>(s => s.Id == video.SectionId);
-
-        video.DisplayOrder = DisplayOrderCalculator.GetNext(lastItemOrder);
+        var video = VideoItem.Create(request.Details.Title, request.Details.VideoUrl, request.Details.Duration, request.Details.SectionId, nextOrder);
 
         await _sectionsRepository.CreateVideoItemAsync(video, cancellationToken);
 

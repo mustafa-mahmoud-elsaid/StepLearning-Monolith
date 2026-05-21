@@ -23,16 +23,10 @@ public class CreateSectionHandler : IRequestHandler<CreateSectionCommand, Result
             return Result<Guid>.Failure("Course not found.");
 
 
-        var lastSectionOrder = await _sectionsRepository.GetLastDisplayOrderAsync<Section>(s => s.Id == request.Details.CourseId)!;
+        var lastSectionOrder = await _sectionsRepository.GetLastDisplayOrderAsync<Section>(s => s.CourseId == request.Details.CourseId)!;
+        var nextOrder = DisplayOrderCalculator.GetNext(lastSectionOrder);
 
-        var section = new Section
-        {
-            Id = Guid.NewGuid(),
-            Title = request.Details.Title,
-            CourseId = request.Details.CourseId
-        };
-
-        section.DisplayOrder = DisplayOrderCalculator.GetNext(lastSectionOrder);
+        var section = Section.Create(request.Details.Title, request.Details.CourseId, nextOrder);
 
         var sectionId = await _sectionsRepository.CreateSectionAsync(section, cancellationToken);
 
