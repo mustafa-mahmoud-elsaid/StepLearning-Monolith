@@ -106,7 +106,10 @@ public class CoursesController : ControllerBase
     [Authorize(Roles = "Instructor")]
     public async Task<IActionResult> Update(Guid id, [FromBody] CourseUpdateDto dto, CancellationToken ct)
     {
-        var result = await _mediator.Send(new UpdateCourseCommand(id, dto), ct);
+        if (!User.TryGetInstructorId(out var instructorId))
+            return Unauthorized("Instructor ID not found in token.");
+
+        var result = await _mediator.Send(new UpdateCourseCommand(id, instructorId, dto), ct);
         return result.IsSuccess ? NoContent() : BadRequest(result.Error);
     }
 
@@ -125,7 +128,10 @@ public class CoursesController : ControllerBase
     [Authorize(Roles = "Instructor")]
     public async Task<IActionResult> Delete(Guid id, CancellationToken ct)
     {
-        var result = await _mediator.Send(new DeleteCourseCommand(id), ct);
+        if (!User.TryGetInstructorId(out var instructorId))
+            return Unauthorized("Instructor ID not found in token.");
+
+        var result = await _mediator.Send(new DeleteCourseCommand(id, instructorId), ct);
         return result.IsSuccess ? NoContent() : BadRequest(result.Error);
     }
 }

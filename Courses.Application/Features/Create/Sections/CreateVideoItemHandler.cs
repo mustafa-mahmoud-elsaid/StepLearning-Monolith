@@ -16,7 +16,9 @@ public class CreateVideoItemHandler : IRequestHandler<CreateVideoItemCommand, Re
     }
     public async Task<Result<Guid>> Handle(CreateVideoItemCommand request, CancellationToken cancellationToken)
     {
-        // TODO: Check section id
+        var section = await _sectionsRepository.GetSectionByIdAsync(request.Details.SectionId, cancellationToken);
+        if (section is null)
+            return Result<Guid>.Failure("Section not found.");
 
         var video = new VideoItem
         {

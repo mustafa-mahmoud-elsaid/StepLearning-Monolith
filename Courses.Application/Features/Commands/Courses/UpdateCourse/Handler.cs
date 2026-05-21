@@ -13,7 +13,8 @@ public class Handler(ICoursesRepository coursesRepository) : IRequestHandler<Upd
         if (course is null)
             return Result.Failure("Course not found.");
 
-        // TODO: Validate that the requesting user is the course instructor (ownership check).
+        if (request.InstructorId != course.InstructorId)
+            return Result.Failure("You are not the owner of this course.");
 
         try
         {
