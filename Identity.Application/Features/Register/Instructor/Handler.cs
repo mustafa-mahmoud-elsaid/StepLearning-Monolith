@@ -1,67 +1,36 @@
 using Identity.Application.Domain.DTO;
-using Identity.Application.Infrastructure;
-using Identity.Application.Infrastructure.JWT;
 using Identity.Application.RepositoryInterfaces;
 using MediatR;
-using Microsoft.AspNetCore.Identity;
 using StepLearning.Shared.Result;
 
 namespace Identity.Application.Features.Register.Instructor;
 
 public class Handler : IRequestHandler<InstructorRegisterCommand, Result<LoginResponse>>
 {
-    private readonly UserManager<ApplicationUser> _userManager;
     private readonly IGenericRepository<Domain.Entities.Instructor> _repository;
-    private readonly ITokenService _tokenService;
+    private readonly UserRegistrationService _registrationService;
 
-    public Handler(UserManager<ApplicationUser> userManager, IGenericRepository<Domain.Entities.Instructor> repository,
-        ITokenService tokenService)
+    public Handler(IGenericRepository<Domain.Entities.Instructor> repository,
+        UserRegistrationService registrationService)
     {
-        _userManager = userManager;
         _repository = repository;
-        _tokenService = tokenService;
+        _registrationService = registrationService;
     }
     public async Task<Result<LoginResponse>> Handle(InstructorRegisterCommand request, CancellationToken cancellationToken)
     {
-        var user = await _userManager.FindByEmailAsync(request.Credentials.Email);
+        var userResult = await _registrationService.CreateUserAsync(
+            request.Credentials.Email, request.Credentials.Password, Domain.AppRoles.Instructor, cancellationToken);
 
-        if (user is not null)
-            return Result<LoginResponse>.Failure("Email already exists");
+        if (!userResult.IsSuccess)
+            return Result<LoginResponse>.Failure(userResult.Error!);
 
-        var dto = request.Credentials;
+        var instructor = Domain.Entities.Instructor.Create(
+            request.Credentials.FirstName, request.Credentials.LastName, userResult.Value!.Id, 
+            request.Credentials.ProfilePictureUrl, request.Credentials.Bio);
 
-        try
-        {
-            var appUser = ApplicationUser.Create(dto.Email);
-            var result = await _userManager.CreateAsync(appUser, dto.Password);
+        await _repository.AddAsync(instructor, cancellationToken);
+        await _repository.SaveChangesAsync(cancellationToken);
 
-            if (!result.Succeeded)
-                return Result<LoginResponse>.Failure("Failed to register the user");
-
-            await _userManager.AddToRoleAsync(appUser, Domain.AppRoles.Instructor);
-
-            var instructor = Domain.Entities.Instructor
-                .Create(dto.FirstName, dto.LastName, appUser.Id, dto.ProfilePictureUrl, dto.Bio);
-
-            // add instructor
-            await _repository.AddAsync(instructor, cancellationToken);
-
-            await _repository.SaveChangesAsync(cancellationToken);
-
-            var jwtToken = await _tokenService.GenerateJWTToken(appUser);
-
-            var refTokenResult = await _tokenService.GenerateRefreshToken(appUser, cancellationToken);
-
-            if (!refTokenResult.IsSuccess)
-                return Result<LoginResponse>.Failure(refTokenResult.Error!);
-
-            return Result<LoginResponse>.Success(new(jwtToken, refTokenResult.Value!));
-
-        }
-        catch (InvalidOperationException ex)
-        {
-            return Result<LoginResponse>.Failure(ex.Message);
-        }
-       
+        return await _registrationService.GenerateTokensAsync(userResult.Value!, cancellationToken);
     }
 }

@@ -37,6 +37,8 @@ public static class DependencyInjection
         services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
         services.AddScoped<ITokenService, TokenService>();
+        services.AddScoped<IUserClaimsProvider, UserClaimsProvider>();
+        services.AddScoped<Identity.Application.Features.Register.UserRegistrationService>();
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(DependencyInjection).Assembly));

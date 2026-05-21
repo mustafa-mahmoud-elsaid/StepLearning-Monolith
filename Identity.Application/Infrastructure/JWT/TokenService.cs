@@ -18,14 +18,14 @@ internal class TokenService : ITokenService
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IRefreshTokenRepository _refTokenRepository;
     private readonly IConfiguration _configuration;
-    private readonly UsersDbContext _dbContext;
+    private readonly IUserClaimsProvider _claimsProvider;
 
-    public TokenService(UserManager<ApplicationUser> userManager, IRefreshTokenRepository refTokenRepository, IConfiguration configuration, UsersDbContext dbContext)
+    public TokenService(UserManager<ApplicationUser> userManager, IRefreshTokenRepository refTokenRepository, IConfiguration configuration, IUserClaimsProvider claimsProvider)
     {
         _userManager = userManager;
         _refTokenRepository = refTokenRepository;
         _configuration = configuration;
-        _dbContext = dbContext;
+        _claimsProvider = claimsProvider;
     }
     public async Task<string> GenerateJWTToken(ApplicationUser user)
     {
@@ -46,17 +46,8 @@ internal class TokenService : ITokenService
         claims.AddRange(userClaims);
         claims.AddRange(rolesClaims);
 
-        var student = await _dbContext.Students.FirstOrDefaultAsync(s => s.UserId == user.Id);
-        if (student != null)
-        {
-            claims.Add(new Claim("studentId", student.Id.ToString()));
-        }
-
-        var instructor = await _dbContext.Instructors.FirstOrDefaultAsync(i => i.UserId == user.Id);
-        if (instructor != null)
-        {
-            claims.Add(new Claim("instructorId", instructor.Id.ToString()));
-        }
+        var additionalClaims = await _claimsProvider.GetAdditionalClaimsAsync(user.Id);
+        claims.AddRange(additionalClaims);
 
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Key"] ?? throw new InvalidOperationException("No key configured")));
 
