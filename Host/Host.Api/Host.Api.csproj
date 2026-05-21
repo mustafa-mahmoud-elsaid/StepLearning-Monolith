@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Courses\Courses.Application\Courses.Application.csproj" />
+    <ProjectReference Include="..\..\Courses\Courses.Infrastructure\Courses.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Enrollments\Enrollment.Application\Enrollment.Application.csproj" />
+    <ProjectReference Include="..\..\Identity\Identity.Application\Identity.Application.csproj" />
+    <ProjectReference Include="..\..\Shared\StepLearning.Shared\StepLearning.Shared.csproj" />
+    <ProjectReference Include="..\..\Commerce\Commerce.Application\Commerce.Application.csproj" />
+    <ProjectReference Include="..\..\Commerce\Commerce.Infrastructure\Commerce.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Notifications\Notifications.Application\Notifications.Application.csproj" />
+    <ProjectReference Include="..\..\Notifications\Notifications.Infrastructure\Notifications.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Bogus" Version="35.6.5" />
+    <PackageReference Include="EFCore.BulkExtensions" Version="10.0.1" />
+    <PackageReference Include="MassTransit.RabbitMQ" Version="9.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.5">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.5" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>c4926005-73d5-4df6-81b2-7b9962d0c3b3</UserSecretsId>
+  </PropertyGroup>
+
+</Project>
+

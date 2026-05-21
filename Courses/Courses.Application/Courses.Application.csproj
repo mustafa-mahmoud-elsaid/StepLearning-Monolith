@@ -7,14 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Shared\StepLearning.Shared\StepLearning.Shared.csproj" />
-    <ProjectReference Include="..\Commerce.Domain\Commerce.Domain.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <PackageReference Include="FluentValidation" Version="12.1.1" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
     <PackageReference Include="MediatR" Version="14.1.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.7" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Courses.Domain\Courses.Domain.csproj" />
+    <ProjectReference Include="..\..\Shared\StepLearning.Shared\StepLearning.Shared.csproj" />
   </ItemGroup>
 
 </Project>
