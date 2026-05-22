@@ -1,32 +1,25 @@
-using Identity.Application.Domain.DTO;
-using Identity.Application.Infrastructure;
-using Identity.Application.Infrastructure.JWT;
+using Identity.Application.DTO;
+using Identity.Application.Interfaces;
 using MediatR;
-using Microsoft.AspNetCore.Identity;
 using StepLearning.Shared.Result;
 
 namespace Identity.Application.Features.Login;
 
 internal sealed class Handler(
-    UserManager<ApplicationUser> userManager,
-    SignInManager<ApplicationUser> signInManager,
+    IIdentityService identityService,
     ITokenService tokenService) : IRequestHandler<LoginCommand, Result<LoginResponse>>
 {
     public async Task<Result<LoginResponse>> Handle(LoginCommand request, CancellationToken cancellationToken)
     {
-        var user = await userManager.FindByEmailAsync(request.Credentials.Email);
-        if (user is null)
-            return Result<LoginResponse>.Failure("Invalid email or password");
+        var authResult = await identityService.CheckCredentialsAsync(request.Credentials.Email, request.Credentials.Password, cancellationToken);
+        if (!authResult.IsSuccess)
+            return Result<LoginResponse>.Failure(authResult.Error!);
 
-        var result = await signInManager.CheckPasswordSignInAsync(user!, request.Credentials.Password, false);
+        var userId = authResult.Value;
 
-        if (!result.Succeeded)
-            return Result<LoginResponse>.Failure("Invalid email or password");
+        var jwtToken = await tokenService.GenerateJWTToken(userId);
 
-
-        var jwtToken = await tokenService.GenerateJWTToken(user!);
-
-        var refTokenResult = await tokenService.GenerateRefreshToken(user, cancellationToken);
+        var refTokenResult = await tokenService.GenerateRefreshToken(userId, cancellationToken);
 
         if (!refTokenResult.IsSuccess)
             return Result<LoginResponse>.Failure(refTokenResult.Error!);

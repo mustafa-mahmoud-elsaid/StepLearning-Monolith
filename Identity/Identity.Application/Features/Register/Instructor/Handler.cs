@@ -1,4 +1,4 @@
-using Identity.Application.Domain.DTO;
+using Identity.Application.DTO;
 using Identity.Application.RepositoryInterfaces;
 using MediatR;
 using StepLearning.Shared.Result;
@@ -16,7 +16,7 @@ internal sealed class Handler(IGenericRepository<Domain.Entities.Instructor> rep
             return Result<LoginResponse>.Failure(userResult.Error!);
 
         var instructor = Domain.Entities.Instructor.Create(
-            request.Credentials.FirstName, request.Credentials.LastName, userResult.Value!.Id, 
+            request.Credentials.FirstName, request.Credentials.LastName, userResult.Value, 
             request.Credentials.ProfilePictureUrl, request.Credentials.Bio);
 
         await repository.AddAsync(instructor, cancellationToken);

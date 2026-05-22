@@ -1,4 +1,4 @@
-using Identity.Application.Domain.Entities;
+using Identity.Domain.Entities;
 
 namespace Identity.Application.RepositoryInterfaces;
 

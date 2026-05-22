@@ -12,6 +12,7 @@
     <ProjectReference Include="..\..\Notifications\Notifications.Infrastructure\Notifications.Infrastructure.csproj" />
     <ProjectReference Include="..\..\Enrollments\Enrollment.Infrastructure\Enrollment.Infrastructure.csproj" />
     <ProjectReference Include="..\..\Enrollments\Enrollment.Domain\Enrollment.Domain.csproj" />
+    <ProjectReference Include="..\..\Identity\Identity.Infrastructure\Identity.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>

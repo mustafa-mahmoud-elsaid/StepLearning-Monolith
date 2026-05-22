@@ -13,6 +13,8 @@
   </Folder>
   <Folder Name="/src/Modules/Identity/">
     <Project Path="Identity/Identity.Application/Identity.Application.csproj" Id="d637935e-8b9b-49f8-b29b-02136c99df8c" />
+    <Project Path="Identity/Identity.Domain/Identity.Domain.csproj" />
+    <Project Path="Identity/Identity.Infrastructure/Identity.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/src/Modules/Notifications/">
     <Project Path="Notifications/Notifications.Application/Notifications.Application.csproj" Id="5052bbbe-e83a-41ce-b9f4-62974cebd5f6" />

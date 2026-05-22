@@ -1,4 +1,4 @@
-using Identity.Application.Domain.DTO;
+using Identity.Application.DTO;
 using Identity.Application.Features.Login;
 using Identity.Application.Features.Logout;
 using Identity.Application.Features.RefreshToken;

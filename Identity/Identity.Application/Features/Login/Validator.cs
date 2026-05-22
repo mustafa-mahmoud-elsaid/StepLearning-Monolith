@@ -1,5 +1,5 @@
 using FluentValidation;
-using Identity.Application.Domain.DTO;
+using Identity.Application.DTO;
 
 namespace Identity.Application.Features.Login;
 

@@ -1,4 +1,4 @@
-using Identity.Application.Domain.DTO;
+using Identity.Application.DTO;
 using Identity.Application.RepositoryInterfaces;
 using MediatR;
 using StepLearning.Shared.Result;
@@ -19,8 +19,7 @@ internal sealed class Handler(
         if (!userResult.IsSuccess)
             return Result<LoginResponse>.Failure(userResult.Error!);
 
-        var student = Domain.Entities.Student.Create(
-            request.Credentials.FullName, userResult.Value!.Id,
+        var student = Domain.Entities.Student.Create(request.Credentials.FullName, userResult.Value,
             request.Credentials.DateOfBirth, request.Credentials.ProfilePictureUrl);
 
         await repository.AddAsync(student, cancellationToken);

@@ -1,16 +1,14 @@
-using Identity.Application.Domain.DTO;
-using Identity.Application.Infrastructure;
-using Identity.Application.Infrastructure.JWT;
+using Identity.Application.DTO;
+using Identity.Application.Interfaces;
 using Identity.Application.RepositoryInterfaces;
 using MediatR;
-using Microsoft.AspNetCore.Identity;
 using StepLearning.Shared.Result;
 
 namespace Identity.Application.Features.RefreshToken;
 internal sealed class Handler(
         IRefreshTokenRepository refreshTokenRepository,
         ITokenService tokenService,
-        UserManager<ApplicationUser> userManager) : IRequestHandler<RefreshTokenCommand, Result<LoginResponse>>
+        IIdentityService identityService) : IRequestHandler<RefreshTokenCommand, Result<LoginResponse>>
 {
 
     public async Task<Result<LoginResponse>> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
@@ -29,14 +27,16 @@ internal sealed class Handler(
         existingToken.Revoke();
 
         // 4. Find the user who owns this token
-        var user = await userManager.FindByIdAsync(existingToken.UserId.ToString());
+        var userResult = await identityService.FindUserByIdAsync(existingToken.UserId, cancellationToken);
 
-        if (user is null)
+        if (!userResult.IsSuccess)
             return Result<LoginResponse>.Failure("User not found.");
 
+        var userId = userResult.Value;
+
         // 5. Generate new JWT + refresh token pair
-        var newJwtToken = await tokenService.GenerateJWTToken(user);
-        var newRefreshTokenResult = await tokenService.GenerateRefreshToken(user, cancellationToken);
+        var newJwtToken = await tokenService.GenerateJWTToken(userId);
+        var newRefreshTokenResult = await tokenService.GenerateRefreshToken(userId, cancellationToken);
 
         if (!newRefreshTokenResult.IsSuccess)
             return Result<LoginResponse>.Failure(newRefreshTokenResult.Error!);

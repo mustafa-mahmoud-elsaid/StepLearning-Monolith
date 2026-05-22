@@ -1,4 +1,4 @@
-using Identity.Application.Domain.DTO;
+using Identity.Application.DTO;
 using MediatR;
 using StepLearning.Shared.Result;
 
