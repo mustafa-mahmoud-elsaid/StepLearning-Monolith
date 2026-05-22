@@ -12,11 +12,14 @@ using Courses.Infrastructure.Data;
 using Identity.Infrastructure.Data;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Notifications.Infrastructure;
 using Notifications.Infrastructure.Consumers;
 using Commerce.Application;
 using Commerce.Infrastructure;
+using Commerce.Infrastructure.Data;
+using Enrollment.Infrastructure.Data;
 using StepLearning.Shared.Abstraction;
 using System.Text;
 
@@ -96,6 +99,16 @@ builder.Services.AddAuthentication(options =>
 
 
 var app = builder.Build();
+
+// ── Run Pending Migrations ───────────────────────────────────────
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    services.GetRequiredService<CoursesDbContext>().Database.Migrate();
+    services.GetRequiredService<UsersDbContext>().Database.Migrate();
+    services.GetRequiredService<EnrollmentDbContext>().Database.Migrate();
+    services.GetRequiredService<CommerceDbContext>().Database.Migrate();
+}
 
 // ── Middleware Pipeline ──────────────────────────────────────────
 if (app.Environment.IsDevelopment())
