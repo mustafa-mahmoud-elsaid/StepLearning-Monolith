@@ -46,8 +46,9 @@ builder.Services.AddMassTransit(cfg =>
         var virtualHost = builder.Configuration["RabbitMq:VirtualHost"] ?? "/";
         var username = builder.Configuration["RabbitMq:Username"] ?? "guest";
         var password = builder.Configuration["RabbitMq:Password"] ?? "guest";
+        var port = builder.Configuration.GetValue<ushort>("RabbitMq:Port", 5672);
 
-        rabbit.Host(host, 56723, virtualHost, h =>
+        rabbit.Host(host, port, virtualHost, h =>
         {
             h.Username(username);
             h.Password(password);
