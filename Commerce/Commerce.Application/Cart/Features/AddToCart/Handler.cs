@@ -1,7 +1,5 @@
 using Commerce.Application.Cart.Repositories;
-using MediatR;
 using StepLearning.Shared.Abstraction;
-using StepLearning.Shared.Result;
 
 namespace Commerce.Application.Cart.Features.AddToCart;
 
@@ -19,7 +17,7 @@ internal sealed class Handler(
         var cart = await cartRepository.GetByStudentIdAsync(request.StudentId, cancellationToken);
         var isNewCart = cart is null;
 
-        cart ??= Domain.Entities.Cart.Create(request.StudentId);
+        cart ??= Domain.Cart.Cart.Create(request.StudentId);
 
         try
         {

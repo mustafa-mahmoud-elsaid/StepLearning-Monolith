@@ -1,0 +1,23 @@
+using Courses.Application.DTO;
+using Courses.Application.RepositoriesContracts;
+using StepLearning.Shared.Pagination;
+
+namespace Courses.Application.Features.Query.Courses.SearchCourses;
+internal sealed class Handler(ICoursesRepository coursesRepository) : IRequestHandler<SearchCoursesQuery, Result<PaginatedResult<CourseCardDto>>>
+{
+
+    public async Task<Result<PaginatedResult<CourseCardDto>>> Handle(SearchCoursesQuery request, CancellationToken cancellationToken)
+    {
+        var result = await coursesRepository.SearchCoursesAsync(
+            request.Title,
+            request.MinPrice,
+            request.MaxPrice,
+            request.PageNumber,
+            request.PageSize,
+            cancellationToken);
+
+        return Result<PaginatedResult<CourseCardDto>>.Success(result);
+    }
+}
+
+

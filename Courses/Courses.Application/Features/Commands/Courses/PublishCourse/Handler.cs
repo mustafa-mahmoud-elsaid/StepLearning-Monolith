@@ -1,0 +1,32 @@
+using Courses.Application.RepositoriesContracts;
+
+namespace Courses.Application.Features.Commands.Courses.PublishCourse;
+internal sealed class Handler(ICoursesRepository coursesRepository) : IRequestHandler<PublishCourseCommand, Result>
+{
+
+    public async Task<Result> Handle(PublishCourseCommand request, CancellationToken cancellationToken)
+    {
+        var course = await coursesRepository.GetCourseWithSectionsAsync(request.CourseId, cancellationToken);
+
+        if (course is null)
+            return Result.Failure("Course not found.");
+
+        if(request.InstructorId != course.InstructorId)
+            return Result.Failure("You are not the owner of this course.");
+
+        try
+        {
+            course.Publish();
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Result.Failure(ex.Message);
+        }
+
+        await coursesRepository.SaveChangesAsync(cancellationToken);
+
+        return Result.Success();
+    }
+}
+
+

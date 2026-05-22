@@ -1,4 +1,3 @@
-using FluentValidation;
 
 namespace Commerce.Application.Cart.Features.ClearCart;
 

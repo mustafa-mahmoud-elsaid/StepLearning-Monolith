@@ -1,5 +1,3 @@
-using MediatR;
-using StepLearning.Shared.Result;
 
 namespace Commerce.Application.Orders.Features.CreateOrder;
 

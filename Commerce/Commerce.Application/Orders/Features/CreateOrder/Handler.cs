@@ -1,8 +1,6 @@
 using Commerce.Application.Cart.Repositories;
 using Commerce.Domain.Orders;
 using Commerce.Application.Orders.Repositories;
-using MediatR;
-using StepLearning.Shared.Result;
 
 namespace Commerce.Application.Orders.Features.CreateOrder;
 

@@ -1,7 +1,6 @@
 using Commerce.Domain.Cart;
 using Commerce.Domain.Orders;
 using Commerce.Domain.Payment;
-using Microsoft.EntityFrameworkCore;
 
 namespace Commerce.Infrastructure.Data;
 

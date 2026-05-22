@@ -6,7 +6,6 @@ using Commerce.Infrastructure.Data;
 using Commerce.Infrastructure.Options;
 using Commerce.Infrastructure.Repositories;
 using Commerce.Infrastructure.Services;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Stripe;

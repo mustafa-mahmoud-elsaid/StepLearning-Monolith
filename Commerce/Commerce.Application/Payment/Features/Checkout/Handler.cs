@@ -1,10 +1,7 @@
 using Commerce.Domain.Payment;
 using Commerce.Application.Payment.Repositories;
 using Commerce.Application.Payment.ServicesInterfaces;
-using FluentValidation;
-using MediatR;
 using StepLearning.Shared.Abstraction;
-using StepLearning.Shared.Result;
 
 using Commerce.Domain.Orders.Enums;
 using Commerce.Application.Orders.Repositories;

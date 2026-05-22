@@ -1,6 +1,4 @@
 using Commerce.Application.Orders.DTO;
-using MediatR;
-using StepLearning.Shared.Result;
 
 namespace Commerce.Application.Orders.Features.GetOrderHistory;
 
