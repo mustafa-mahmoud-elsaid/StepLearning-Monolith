@@ -1,5 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-namespace Enrollment.Application.Data;
+using Microsoft.EntityFrameworkCore;
+namespace Enrollment.Infrastructure.Data;
 
 public sealed class EnrollmentDbContext : DbContext
 {

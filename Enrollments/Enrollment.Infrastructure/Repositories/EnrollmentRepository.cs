@@ -1,8 +1,9 @@
 
-using Enrollment.Application.Data;
+using Enrollment.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Enrollment.Application.Repositories;
 
-namespace Enrollment.Application.Repositories;
+namespace Enrollment.Infrastructure.Repositories;
 
 internal class EnrollmentRepository : IEnrollmentRepository
 {

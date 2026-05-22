@@ -1,4 +1,4 @@
-using Enrollment.Application.Domain.Enums;
+using Enrollment.Domain.Enums;
 
 namespace Enrollment.Application.DTO;
 

@@ -1,7 +1,7 @@
 using Bogus;
 using EFCore.BulkExtensions;
-using Enrollment.Application.Data;
-using Enrollment.Application.Domain.Enums;
+using Enrollment.Infrastructure.Data;
+using Enrollment.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Commerce.Domain.Payment;
@@ -28,7 +28,7 @@ public static class PaymentAndEnrollmentSeeder
 
         var payments = new List<PaymentRecord>();
         // Fully qualified to avoid ambiguity if there are other Enrollment classes
-        var enrollments = new List<Enrollment.Application.Domain.Entities.Enrollment>();
+        var enrollments = new List<Enrollment.Domain.Entities.Enrollment>();
 
         int batchSize = 500; // Batch students to manage memory effectively
         
@@ -72,7 +72,7 @@ public static class PaymentAndEnrollmentSeeder
                             payment.MarkSucceeded(faker.Random.AlphaNumeric(12).ToUpper());
                             
                             // If payment succeeds, they get enrolled
-                            var enrollment = Enrollment.Application.Domain.Entities.Enrollment.Create(
+                            var enrollment = Enrollment.Domain.Entities.Enrollment.Create(
                                 studentId, 
                                 courseId, 
                                 payment.Id, 

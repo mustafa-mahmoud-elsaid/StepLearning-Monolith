@@ -1,6 +1,6 @@
-﻿using Enrollment.Application.Domain.Enums;
+using Enrollment.Domain.Enums;
 
-namespace Enrollment.Application.Domain.Entities;
+namespace Enrollment.Domain.Entities;
 
 public class Enrollment
 {

@@ -1,6 +1,7 @@
 using Courses.Application;
 using Courses.Infrastructure;
 using Enrollment.Application;
+using Enrollment.Infrastructure;
 using Enrollment.Application.Consumers;
 using Host.Api.Messaging;
 using Host.Api.Middleware;
@@ -26,6 +27,7 @@ builder.Services.AddCoursesApplication();
 builder.Services.AddCoursesInfrastructure(builder.Configuration);
 builder.Services.AddIdentityApplication(builder.Configuration);
 builder.Services.AddEnrollmentApplication(builder.Configuration);
+builder.Services.AddEnrollmentInfrastructure(builder.Configuration);
 builder.Services.AddCommerceApplication();
 builder.Services.AddCommerceInfrastructure(builder.Configuration);
 builder.Services.AddNotificationsInfrastructure();

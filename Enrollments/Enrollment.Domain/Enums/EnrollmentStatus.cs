@@ -1,4 +1,4 @@
-﻿namespace Enrollment.Application.Domain.Enums;
+namespace Enrollment.Domain.Enums;
 
 public enum EnrollmentStatus
 {

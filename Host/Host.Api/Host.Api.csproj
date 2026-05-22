@@ -10,6 +10,8 @@
     <ProjectReference Include="..\..\Commerce\Commerce.Infrastructure\Commerce.Infrastructure.csproj" />
     <ProjectReference Include="..\..\Notifications\Notifications.Application\Notifications.Application.csproj" />
     <ProjectReference Include="..\..\Notifications\Notifications.Infrastructure\Notifications.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Enrollments\Enrollment.Infrastructure\Enrollment.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Enrollments\Enrollment.Domain\Enrollment.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>

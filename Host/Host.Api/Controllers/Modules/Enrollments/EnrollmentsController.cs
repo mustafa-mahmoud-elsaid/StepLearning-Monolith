@@ -1,4 +1,4 @@
-using Enrollment.Application.Domain.Enums;
+using Enrollment.Domain.Enums;
 using Enrollment.Application.DTO;
 using Enrollment.Application.Features.Commands.Enroll;
 using MediatR;

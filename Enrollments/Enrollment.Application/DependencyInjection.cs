@@ -1,9 +1,6 @@
-﻿using Enrollment.Application.Data;
-using Enrollment.Application.Repositories;
 using Enrollment.Application.Services;
 using FluentValidation;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using StepLearning.Shared;
@@ -26,15 +23,6 @@ public static class DependencyInjection
             typeof(IPipelineBehavior<,>),
             typeof(ValidationBehavior<,>));
 
-        services.AddDbContext<EnrollmentDbContext>(options =>
-        {
-            options.UseSqlServer(configuration.GetConnectionString("StepLearning.EnrollmentsDb"),
-                sql =>
-                {
-                    sql.EnableRetryOnFailure(2);
-                });
-        });
-        services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
         services.AddScoped<IEnrollmentService, EnrollmentService>();
 
         return services;
