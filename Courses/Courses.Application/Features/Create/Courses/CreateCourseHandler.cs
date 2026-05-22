@@ -1,8 +1,6 @@
 using Courses.Application.RepositoriesContracts;
 using Courses.Domain.Entities;
-using MediatR;
 using StepLearning.Shared.Abstraction;
-using StepLearning.Shared.Result;
 
 namespace Courses.Application.Features.Create.Courses;
 

@@ -1,7 +1,5 @@
 using Identity.Application.DTO;
 using Identity.Application.RepositoryInterfaces;
-using MediatR;
-using StepLearning.Shared.Result;
 
 namespace Identity.Application.Features.Register.Student;
 

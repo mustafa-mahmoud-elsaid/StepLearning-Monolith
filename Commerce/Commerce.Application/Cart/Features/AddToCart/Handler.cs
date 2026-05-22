@@ -1,7 +1,5 @@
 using Commerce.Application.Cart.Repositories;
-using MediatR;
 using StepLearning.Shared.Abstraction;
-using StepLearning.Shared.Result;
 
 namespace Commerce.Application.Cart.Features.AddToCart;
 

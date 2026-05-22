@@ -1,6 +1,4 @@
 using Courses.Application.RepositoriesContracts;
-using MediatR;
-using StepLearning.Shared.Result;
 
 namespace Courses.Application.Features.Commands.Courses.DeleteCourse;
 internal sealed class Handler(ICoursesRepository coursesRepository) : IRequestHandler<DeleteCourseCommand, Result>

@@ -1,6 +1,5 @@
 using Commerce.Application.Cart.Repositories;
 using Commerce.Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
 using CartEntity = Commerce.Domain.Cart.Cart;
 
 namespace Commerce.Infrastructure.Repositories;

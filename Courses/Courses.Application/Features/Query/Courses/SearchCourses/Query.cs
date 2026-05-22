@@ -1,7 +1,5 @@
 using Courses.Application.DTO;
-using MediatR;
 using StepLearning.Shared.Pagination;
-using StepLearning.Shared.Result;
 
 namespace Courses.Application.Features.Query.Courses.SearchCourses;
 

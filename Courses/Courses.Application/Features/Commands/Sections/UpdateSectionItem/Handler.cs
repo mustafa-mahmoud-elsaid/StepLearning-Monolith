@@ -1,8 +1,5 @@
 using Courses.Application.RepositoriesContracts;
-using MediatR;
 using Courses.Application.RepositoriesContracts;
-using MediatR;
-using StepLearning.Shared.Result;
 
 namespace Courses.Application.Features.Commands.Sections.UpdateSectionItem;
 internal sealed class Handler(ISectionsRepository _sectionsRepository) : IRequestHandler<UpdateSectionItemCommand, Result>

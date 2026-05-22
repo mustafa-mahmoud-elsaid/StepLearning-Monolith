@@ -1,5 +1,4 @@
 using Courses.Application.Utilities;
-using FluentValidation;
 
 namespace Courses.Application.Features.Create.Sections;
 

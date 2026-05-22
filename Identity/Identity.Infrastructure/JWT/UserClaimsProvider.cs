@@ -1,7 +1,6 @@
 using System.Security.Claims;
 using Identity.Application.Interfaces;
 using Identity.Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
 
 namespace Identity.Infrastructure.JWT;
 

@@ -1,7 +1,6 @@
 using Enrollment.Application.Repositories;
 using Enrollment.Infrastructure.Data;
 using Enrollment.Infrastructure.Repositories;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 

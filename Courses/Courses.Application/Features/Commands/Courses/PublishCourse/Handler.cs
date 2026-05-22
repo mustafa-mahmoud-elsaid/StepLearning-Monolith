@@ -1,6 +1,4 @@
 using Courses.Application.RepositoriesContracts;
-using MediatR;
-using StepLearning.Shared.Result;
 
 namespace Courses.Application.Features.Commands.Courses.PublishCourse;
 internal sealed class Handler(ICoursesRepository coursesRepository) : IRequestHandler<PublishCourseCommand, Result>

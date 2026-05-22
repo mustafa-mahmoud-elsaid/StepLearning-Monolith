@@ -1,7 +1,6 @@
 using Identity.Domain.Entities;
 using Identity.Infrastructure.Data;
 using Identity.Application.RepositoryInterfaces;
-using Microsoft.EntityFrameworkCore;
 using StepLearning.Shared.Abstraction;
 
 namespace Identity.Infrastructure.Services;

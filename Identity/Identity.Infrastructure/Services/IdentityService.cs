@@ -1,8 +1,6 @@
 using Identity.Application.Interfaces;
 using Identity.Infrastructure.Data;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using StepLearning.Shared.Result;
 
 namespace Identity.Infrastructure.Services;
 

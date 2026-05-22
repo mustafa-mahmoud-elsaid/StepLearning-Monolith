@@ -5,7 +5,6 @@ using Identity.Infrastructure.JWT;
 using Identity.Infrastructure.Repositories;
 using Identity.Infrastructure.Services;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using StepLearning.Shared.Abstraction;

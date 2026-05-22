@@ -1,6 +1,5 @@
 
 using Enrollment.Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
 using Enrollment.Application.Repositories;
 
 namespace Enrollment.Infrastructure.Repositories;

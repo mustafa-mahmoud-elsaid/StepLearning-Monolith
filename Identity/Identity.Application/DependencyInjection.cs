@@ -1,7 +1,5 @@
-using FluentValidation;
 using Identity.Application.Interfaces;
 using Identity.Application.RepositoryInterfaces;
-using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using StepLearning.Shared;

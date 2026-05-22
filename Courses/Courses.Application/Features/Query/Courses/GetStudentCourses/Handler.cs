@@ -1,9 +1,7 @@
 using Courses.Application.DTO;
 using Courses.Application.RepositoriesContracts;
-using MediatR;
 using StepLearning.Shared.Abstraction;
 using StepLearning.Shared.Pagination;
-using StepLearning.Shared.Result;
 
 namespace Courses.Application.Features.Query.Courses.GetStudentCourses;
 

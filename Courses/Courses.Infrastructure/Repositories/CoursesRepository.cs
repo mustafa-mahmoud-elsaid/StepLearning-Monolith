@@ -2,7 +2,6 @@ using Courses.Application.DTO;
 using Courses.Application.RepositoriesContracts;
 using Courses.Domain.Entities;
 using Courses.Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
 using StepLearning.Shared.Abstraction;
 using StepLearning.Shared.Pagination;
 

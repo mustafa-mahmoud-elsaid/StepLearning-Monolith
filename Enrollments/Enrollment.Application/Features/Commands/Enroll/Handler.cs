@@ -1,8 +1,6 @@
 using Enrollment.Application.Repositories;
-using MediatR;
 using StepLearning.Shared.Abstraction;
 using StepLearning.Shared.Events;
-using StepLearning.Shared.Result;
 
 namespace Enrollment.Application.Features.Commands.Enroll;
 

@@ -2,7 +2,6 @@ using Courses.Application.RepositoriesContracts;
 using Courses.Domain;
 using Courses.Domain.Entities;
 using Courses.Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
 namespace Courses.Infrastructure.Repositories;

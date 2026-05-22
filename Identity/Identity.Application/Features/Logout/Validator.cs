@@ -1,4 +1,3 @@
-using FluentValidation;
 
 namespace Identity.Application.Features.Logout;
 

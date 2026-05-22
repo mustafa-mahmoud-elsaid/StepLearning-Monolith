@@ -1,4 +1,3 @@
-using StepLearning.Shared.Result;
 
 namespace Identity.Application.Interfaces;
 

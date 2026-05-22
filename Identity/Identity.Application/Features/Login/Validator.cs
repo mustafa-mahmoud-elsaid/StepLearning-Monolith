@@ -1,4 +1,3 @@
-using FluentValidation;
 using Identity.Application.DTO;
 
 namespace Identity.Application.Features.Login;

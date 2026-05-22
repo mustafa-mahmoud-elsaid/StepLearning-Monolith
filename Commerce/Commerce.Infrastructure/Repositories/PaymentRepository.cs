@@ -2,7 +2,6 @@ using Commerce.Domain.Payment;
 using Commerce.Domain.Payment.Enums;
 using Commerce.Application.Payment.Repositories;
 using Commerce.Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
 
 namespace Commerce.Infrastructure.Repositories;
 

@@ -2,7 +2,6 @@ using Enrollment.Domain.Enums;
 using Enrollment.Application.DTO;
 using Enrollment.Application.Features.Commands.Enroll;
 using MassTransit;
-using MediatR;
 using Microsoft.Extensions.Logging;
 using StepLearning.Shared.Events;
 

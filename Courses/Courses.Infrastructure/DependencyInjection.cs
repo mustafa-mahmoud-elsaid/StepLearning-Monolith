@@ -1,8 +1,7 @@
-﻿using Courses.Application.RepositoriesContracts;
+using Courses.Application.RepositoriesContracts;
 using Courses.Infrastructure.Data;
 using Courses.Infrastructure.Repositories;
 using Courses.Infrastructure.Services;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using StepLearning.Shared.Abstraction;

@@ -1,8 +1,6 @@
 using Identity.Application.DTO;
 using Identity.Application.Interfaces;
 using Identity.Application.RepositoryInterfaces;
-using MediatR;
-using StepLearning.Shared.Result;
 
 namespace Identity.Application.Features.RefreshToken;
 internal sealed class Handler(

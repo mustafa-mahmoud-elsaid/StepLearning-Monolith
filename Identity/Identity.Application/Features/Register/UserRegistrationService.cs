@@ -1,6 +1,5 @@
 using Identity.Application.DTO;
 using Identity.Application.Interfaces;
-using StepLearning.Shared.Result;
 
 namespace Identity.Application.Features.Register;
 

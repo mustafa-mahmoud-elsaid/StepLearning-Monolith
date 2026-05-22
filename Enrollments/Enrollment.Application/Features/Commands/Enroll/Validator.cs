@@ -1,4 +1,3 @@
-using FluentValidation;
 
 namespace Enrollment.Application.Features.Commands.Enroll;
 

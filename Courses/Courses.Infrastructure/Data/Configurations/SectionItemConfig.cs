@@ -1,5 +1,4 @@
-﻿using Courses.Domain.Entities;
-using Microsoft.EntityFrameworkCore;
+using Courses.Domain.Entities;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Courses.Infrastructure.Data.Configurations;

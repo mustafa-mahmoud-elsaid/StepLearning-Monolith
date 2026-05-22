@@ -1,6 +1,5 @@
 using Identity.Infrastructure.Data;
 using Identity.Application.RepositoryInterfaces;
-using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
 namespace Identity.Infrastructure.Repositories;

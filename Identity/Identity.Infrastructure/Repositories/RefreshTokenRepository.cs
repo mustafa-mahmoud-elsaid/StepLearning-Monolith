@@ -1,7 +1,6 @@
 using Identity.Domain.Entities;
 using Identity.Infrastructure.Data;
 using Identity.Application.RepositoryInterfaces;
-using Microsoft.EntityFrameworkCore;
 
 namespace Identity.Infrastructure.Repositories;
 

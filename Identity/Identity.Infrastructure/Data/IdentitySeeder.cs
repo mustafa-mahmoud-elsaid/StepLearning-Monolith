@@ -3,7 +3,6 @@ using EFCore.BulkExtensions;
 using Identity.Domain;
 using Identity.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 namespace Identity.Infrastructure.Data;
 

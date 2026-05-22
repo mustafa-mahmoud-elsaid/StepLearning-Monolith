@@ -1,7 +1,6 @@
 using Commerce.Domain.Orders;
 using Commerce.Application.Orders.Repositories;
 using Commerce.Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
 
 namespace Commerce.Infrastructure.Repositories;
 
