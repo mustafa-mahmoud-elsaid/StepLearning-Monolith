@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  host.api:
+    image:  moustfa/steplearning-web:v1.0
+    build:
+      context: .
+      dockerfile: Host/Host.Api/Dockerfile
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8080
+      - ASPNETCORE_HTTPS_PORTS=8081
+      - ConnectionStrings__CoursesDbConnection=Server=sqlserver;Database=StepLearning.CoursesDb;User Id=sa;Password=Your_password123;TrustServerCertificate=true;MultipleActiveResultSets=true
+      - ConnectionStrings__StepLearning.UsersDb=Server=sqlserver;Database=StepLearning.UsersDb;User Id=sa;Password=Your_password123;TrustServerCertificate=true;MultipleActiveResultSets=true
+      - ConnectionStrings__StepLearning.EnrollmentsDb=Server=sqlserver;Database=StepLearning.EnrollmentsDb;User Id=sa;Password=Your_password123;TrustServerCertificate=true;MultipleActiveResultSets=true
+      - ConnectionStrings__StepLearning.CommerceDb=Server=sqlserver;Database=StepLearning.CommerceDb;User Id=sa;Password=Your_password123;TrustServerCertificate=true;MultipleActiveResultSets=true
+      - RabbitMq__Host=rabbitmq
+      - RabbitMq__Port=5672
+    depends_on:
+      - sqlserver
+      - rabbitmq
+    networks:
+      - steplearning-net
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    ports:
+      - "1433:1433"
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=Your_password123
+    networks:
+      - steplearning-net
+      
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    networks:
+      - steplearning-net
+
+networks:
+  steplearning-net:
+    driver: bridge
