@@ -1,4 +1,5 @@
 using Commerce.Application.Cart.Repositories;
+using Commerce.Application.Cart.ServicesInterfaces;
 using Commerce.Application.Orders.Repositories;
 using Commerce.Application.Payment.Repositories;
 using Commerce.Application.Payment.ServicesInterfaces;
@@ -31,6 +32,15 @@ public static class DependencyInjection
         StripeConfiguration.ApiKey = configuration["Stripe:SecretKey"];
         services.AddScoped<IPaymentService, StripePaymentService>();
         services.AddScoped<IPaymentWebhookService, StripePaymentWebhookService>();
+
+        services.AddHttpContextAccessor();
+
+        services.AddScoped<ICartOwnerProvider, CartOwnerProvider>();
+        services.AddScoped<ICartCacheRepository, CartCacheRepository>();
+        services.AddStackExchangeRedisCache(options =>
+        {
+            options.Configuration = configuration.GetConnectionString("Redis");
+        });
 
         return services;
     }
