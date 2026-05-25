@@ -105,6 +105,8 @@ public static class CourseSeeder
                                 }
                             }
                         }
+
+                        course.Publish();
                     }
                 }
 

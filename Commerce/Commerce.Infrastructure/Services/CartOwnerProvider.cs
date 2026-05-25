@@ -7,7 +7,7 @@ namespace Commerce.Infrastructure.Services;
 
 internal sealed class CartOwnerProvider(IHttpContextAccessor httpContextAccessor) : ICartOwnerProvider
 {
-    public CartOwner GetOwnerId()
+    public CartOwner GetOwner()
     {
         var context = httpContextAccessor.HttpContext;
 

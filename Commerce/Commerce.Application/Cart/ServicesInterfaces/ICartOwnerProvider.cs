@@ -4,5 +4,5 @@ namespace Commerce.Application.Cart.ServicesInterfaces;
 
 public interface ICartOwnerProvider
 {
-    CartOwner GetOwnerId();
+    CartOwner GetOwner();
 }
