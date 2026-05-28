@@ -17,7 +17,7 @@ internal sealed class CartOwnerProvider(IHttpContextAccessor httpContextAccessor
         {
             var userId = user.FindFirst(ClaimTypes.NameIdentifier)!.Value;
 
-            return new($"user:{userId}", false, Guid.TryParse(userId, out var result) ? result : Guid.Empty);
+            return new($"cart:user:{userId}", false, Guid.TryParse(userId, out var result) ? result : Guid.Empty);
         }
 
         const string cookieName = "guest-cart-id";
@@ -29,6 +29,6 @@ internal sealed class CartOwnerProvider(IHttpContextAccessor httpContextAccessor
             context.Response.Cookies.Append(cookieName, guestId);
         }
 
-        return new($"guest:${guestId}", false, null);
+        return new($"cart:guest:${guestId}", false, null);
     }
 }

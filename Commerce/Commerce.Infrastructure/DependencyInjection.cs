@@ -9,6 +9,7 @@ using Commerce.Infrastructure.Repositories;
 using Commerce.Infrastructure.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using StackExchange.Redis;
 using Stripe;
 
 namespace Commerce.Infrastructure;
@@ -37,10 +38,17 @@ public static class DependencyInjection
 
         services.AddScoped<ICartOwnerProvider, CartOwnerProvider>();
         services.AddScoped<ICartCacheRepository, CartCacheRepository>();
+
+        var redisConnection = configuration
+            .GetConnectionString("Redis");
+
         services.AddStackExchangeRedisCache(options =>
         {
-            options.Configuration = configuration.GetConnectionString("Redis");
+            options.Configuration = redisConnection;
         });
+
+        services.AddSingleton<IConnectionMultiplexer>(
+            ConnectionMultiplexer.Connect(redisConnection!));
 
         return services;
     }

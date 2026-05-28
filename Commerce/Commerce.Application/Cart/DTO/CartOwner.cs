@@ -1,3 +1,3 @@
 ﻿namespace Commerce.Application.Cart.DTO;
 
-public sealed record CartOwner(string Id, bool IsGuest, Guid? UserId);
+public sealed record CartOwner(string Key, bool IsGuest, Guid? UserId);

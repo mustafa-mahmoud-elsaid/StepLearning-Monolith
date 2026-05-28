@@ -1,10 +1,14 @@
-﻿namespace Commerce.Application.Cart.Repositories;
+﻿using Commerce.Application.Cart.DTO;
+using Commerce.Domain.Cart;
+
+namespace Commerce.Application.Cart.Repositories;
 
 public interface ICartCacheRepository
 {
-    Task<Domain.Cart.Cart?> GetAsync(string ownerId, CancellationToken cancellationToken = default);
+    Task<List<CartItem>?> GetAsync(string cartKey, CancellationToken cancellationToken = default);
 
-    Task SaveAsync(string ownerId, Domain.Cart.Cart cart, TimeSpan ttl, CancellationToken cancellationToken = default);
-
-    Task RemoveAsync(string ownerId, CancellationToken cancellationToken = default);
+    Task AddOrUpdateAsync(string cartKey,CartItemDto item, CancellationToken cancellationToken = default);
+    Task CacheCartAsync(string cartKey, IReadOnlyCollection<CartItemDto> items, CancellationToken cancellationToken = default);
+    Task RemoveItemAsync(string cartKey, string courseId, CancellationToken cancellationToken = default);
+    Task<bool> CartExistsAsync(string cartKey);
 }

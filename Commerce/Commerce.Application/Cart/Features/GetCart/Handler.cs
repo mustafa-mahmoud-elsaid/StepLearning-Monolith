@@ -1,6 +1,7 @@
 using Commerce.Application.Cart.DTO;
 using Commerce.Application.Cart.Repositories;
 using Commerce.Application.Cart.ServicesInterfaces;
+using Commerce.Domain.Cart;
 
 namespace Commerce.Application.Cart.Features.GetCart;
 
@@ -16,7 +17,7 @@ internal sealed class Handler(
 
         var cachedCart =
             await cartCacheRepository.GetAsync(
-                owner.Id,
+                owner.Key,
                 cancellationToken);
 
         if (cachedCart is not null)
@@ -33,28 +34,29 @@ internal sealed class Handler(
         if (persistedCart is null)
             return EmptyCart();
 
-        await cartCacheRepository.SaveAsync(
-            owner.Id,
-            persistedCart,
+        await cartCacheRepository.CacheCartAsync(
+            owner.Key,
+            persistedCart.Items.ToList(),
             TimeSpan.FromDays(8),
             cancellationToken);
 
-        return CartSuccessResult(persistedCart);
+        return CartSuccessResult(
+            persistedCart.Items.ToList());
     }
     private static Result<CartDto> EmptyCart()
     {
         return Result<CartDto>.Success(
             new CartDto([], 0));
     }
-    private static Result<CartDto> CartSuccessResult(Domain.Cart.Cart cart)
+    private static Result<CartDto> CartSuccessResult(List<CartItem> items)
     {
-        var items = cart.Items
+        var itemsDto = items
             .Select(i => 
-            new CartItemDto(i.Id, i.CourseTitle, i.Price))
+            new CartItemDto(i.CourseId, i.CourseTitle, i.Price))
             .ToList();
 
         return Result<CartDto>.Success(
-            new(items,
+            new(itemsDto,
             items
             .Sum(i => i.Price)));
     }

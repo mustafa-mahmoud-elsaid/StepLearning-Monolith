@@ -1,39 +1,111 @@
-﻿using Commerce.Application.Cart.Repositories;
+﻿using Commerce.Application.Cart.DTO;
+using Commerce.Application.Cart.Repositories;
 using Commerce.Domain.Cart;
+using MassTransit.Initializers;
 using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using StackExchange.Redis;
 using System.Text.Json;
 
 namespace Commerce.Infrastructure.Repositories;
 
-internal sealed class CartCacheRepository(IDistributedCache cache) : ICartCacheRepository
+internal sealed class CartCacheRepository : ICartCacheRepository
 {
-    public async Task<Cart?> GetAsync(string ownerId, CancellationToken cancellationToken = default)
+    private readonly IDistributedCache _ditributedCache;
+    private readonly int _expirationDays;
+    private readonly ILogger<CartCacheRepository> _logger;
+    private readonly IDatabase _redis;
+
+    public CartCacheRepository(
+        IDistributedCache ditributedCache,
+        IConnectionMultiplexer redis,
+        IConfiguration configuration,
+        ILogger<CartCacheRepository> logger)
     {
-        var cartJson = await cache.GetStringAsync(ownerId, cancellationToken);
+        _ditributedCache = ditributedCache;
+        _expirationDays = configuration.GetValue<int>("RedisSettings:CartExpirationDays");
 
-        if (cartJson is null) return null;
-
-        return JsonSerializer.Deserialize<Cart>(cartJson);
-    }
-
-    public async Task RemoveAsync(string ownerId, CancellationToken cancellationToken = default)
-    {
-        await cache.RemoveAsync(ownerId, cancellationToken);
-    }
-
-    public async Task SaveAsync(string ownerId, Cart cart, TimeSpan ttl, CancellationToken cancellationToken = default)
-    {
-        var cacheOptions = new DistributedCacheEntryOptions
+        if (_expirationDays <= 0)
         {
-            SlidingExpiration = TimeSpan.FromTicks(ttl.Ticks * 3 / 4),
-            AbsoluteExpirationRelativeToNow = ttl,
-        };
+            logger.LogWarning(
+             "Invalid or missing configuration for {ConfigKey}. " +
+             "Using default value of {DefaultDays} days.",
+             "RedisSettings:CartExpirationDays",
+             7);
 
-        var jsonOptions = new JsonSerializerOptions();
-        jsonOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+            _expirationDays = 7;
+        }
 
-        var cartJson = JsonSerializer.Serialize(cart, jsonOptions);
+        _logger = logger;
+        _redis = redis.GetDatabase();
+    }
 
-        await cache.SetStringAsync(ownerId, cartJson, cacheOptions, cancellationToken);
+    public async Task<List<CartItem>?> GetAsync(string cartKey, CancellationToken cancellationToken = default)
+    {
+        var values =
+            await _redis.HashValuesAsync(cartKey);
+
+        if (values is null)
+            return null;
+
+        return values
+            .Select(v =>
+            JsonSerializer.Deserialize<CartItem>(v.ToString())!)
+            .ToList();
+
+    }
+
+    public async Task RemoveItemAsync(string cartKey, string courseId, CancellationToken cancellationToken = default)
+    {
+        await _redis.HashDeleteAsync(
+            cartKey,
+            courseId);
+    }
+
+    public async Task AddOrUpdateAsync(string cartKey, CartItemDto item, CancellationToken cancellationToken = default)
+    {
+        await _redis.HashSetAsync(
+            cartKey,
+            item.CourseId.ToString(),
+            JsonSerializer.Serialize(item));
+
+        await _redis.KeyExpireAsync(
+        cartKey,
+        TimeSpan.FromDays(_expirationDays));
+    }
+
+    public async Task CacheCartAsync(
+        string cartKey,
+        IReadOnlyCollection<CartItemDto> items,
+        CancellationToken cancellationToken = default)
+    {
+        var transaction = _redis.CreateTransaction();
+
+        _ = transaction.KeyDeleteAsync(cartKey);
+
+        if (items.Count > 0)
+        {
+            var hashEntries = items.Select(item =>
+            {
+                return new HashEntry(item.CourseId.ToString(), JsonSerializer.Serialize(item));
+            }).ToArray();
+
+            _ = transaction.HashSetAsync(
+                cartKey,
+                hashEntries);
+
+        }
+
+        _ = transaction.KeyExpireAsync(
+            cartKey,
+            TimeSpan.FromDays(_expirationDays));
+
+        await transaction.ExecuteAsync();
+
+    }
+    public async Task<bool> CartExistsAsync(string cartKey)
+    {
+        return await _redis.KeyExistsAsync(cartKey);
     }
 }
