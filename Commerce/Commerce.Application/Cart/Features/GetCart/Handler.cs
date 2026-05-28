@@ -36,8 +36,8 @@ internal sealed class Handler(
 
         await cartCacheRepository.CacheCartAsync(
             owner.Key,
-            persistedCart.Items.ToList(),
-            TimeSpan.FromDays(8),
+            persistedCart.Items.Select(item =>
+            new CartItemDto(item.CourseId, item.CourseTitle, item.Price)).ToList(),
             cancellationToken);
 
         return CartSuccessResult(
