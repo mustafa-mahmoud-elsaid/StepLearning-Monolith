@@ -22,6 +22,9 @@ internal sealed class Handler(
                 request.CourseId.ToString(),
                 cancellationToken);
 
+            if (!owner.IsGuest)
+                await cartCacheRepository.MarkDirtyAsync(owner.Key);
+
             return Result.Success();
         }
 

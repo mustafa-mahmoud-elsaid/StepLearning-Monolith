@@ -18,8 +18,11 @@ using Notifications.Infrastructure;
 using Notifications.Infrastructure.Consumers;
 using Commerce.Application;
 using Commerce.Infrastructure;
+using Commerce.Infrastructure.BackgroundJobs;
 using Commerce.Infrastructure.Data;
 using Enrollment.Infrastructure.Data;
+using Hangfire;
+using Hangfire.SqlServer;
 using StepLearning.Shared.Abstraction;
 using System.Text;
 
@@ -36,6 +39,23 @@ builder.Services.AddEnrollmentInfrastructure(builder.Configuration);
 builder.Services.AddCommerceApplication();
 builder.Services.AddCommerceInfrastructure(builder.Configuration);
 builder.Services.AddNotificationsInfrastructure();
+
+// ── Hangfire ─────────────────────────────────────────────────────
+builder.Services.AddHangfire(config => config
+    .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+    .UseSimpleAssemblyNameTypeSerializer()
+    .UseRecommendedSerializerSettings()
+    .UseSqlServerStorage(
+        builder.Configuration.GetConnectionString("StepLearning.CommerceDb"),
+        new SqlServerStorageOptions
+        {
+            CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
+            SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
+            QueuePollInterval = TimeSpan.FromSeconds(15),
+            UseRecommendedIsolationLevel = true,
+            SchemaName = "Hangfire"
+        }));
+builder.Services.AddHangfireServer();
 
 builder.Services.AddScoped<IIntegrationEventPublisher, MassTransitIntegrationEventPublisher>();
 builder.Services.AddMassTransit(cfg =>
@@ -128,6 +148,13 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapHangfireDashboard("/hangfire");
+
+RecurringJob.AddOrUpdate<CartSyncJob>(
+    "cart-sync",
+    job => job.ExecuteAsync(),
+    "*/5 * * * *");
 
 // ── Seed Data ────────────────────────────────────────────────────
 await IdentitySeeder.SeedRolesAsync(app.Services);

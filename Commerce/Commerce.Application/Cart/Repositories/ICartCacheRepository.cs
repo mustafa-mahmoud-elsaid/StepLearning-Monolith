@@ -1,4 +1,4 @@
-﻿using Commerce.Application.Cart.DTO;
+using Commerce.Application.Cart.DTO;
 using Commerce.Domain.Cart;
 
 namespace Commerce.Application.Cart.Repositories;
@@ -12,4 +12,6 @@ public interface ICartCacheRepository
     Task RemoveItemAsync(string cartKey, string courseId, CancellationToken cancellationToken = default);
     Task RemoveCartAsync(string cartKey);
     Task<bool> CartExistsAsync(string cartKey);
+    Task MarkDirtyAsync(string cartKey);
+    Task<List<string>> PopDirtyKeysAsync(int count, int minAgeMinutes);
 }

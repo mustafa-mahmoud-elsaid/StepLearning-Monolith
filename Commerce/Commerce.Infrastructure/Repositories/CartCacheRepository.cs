@@ -1,4 +1,4 @@
-﻿using Commerce.Application.Cart.DTO;
+using Commerce.Application.Cart.DTO;
 using Commerce.Application.Cart.Repositories;
 using Commerce.Domain.Cart;
 using MassTransit.Initializers;
@@ -12,6 +12,8 @@ namespace Commerce.Infrastructure.Repositories;
 
 internal sealed class CartCacheRepository : ICartCacheRepository
 {
+    private const string DirtyCartsKey = "dirty-carts";
+
     private readonly IDistributedCache _ditributedCache;
     private readonly int _expirationDays;
     private readonly ILogger<CartCacheRepository> _logger;
@@ -58,21 +60,27 @@ internal sealed class CartCacheRepository : ICartCacheRepository
 
     public async Task RemoveItemAsync(string cartKey, string courseId, CancellationToken cancellationToken = default)
     {
-        await _redis.HashDeleteAsync(
+        var deleteTask = _redis.HashDeleteAsync(cartKey, courseId);
+
+        var expireTask = _redis.KeyExpireAsync(
             cartKey,
-            courseId);
+            TimeSpan.FromDays(_expirationDays));
+
+        await Task.WhenAll(deleteTask, expireTask);
     }
 
     public async Task AddOrUpdateAsync(string cartKey, CartItemDto item, CancellationToken cancellationToken = default)
     {
-        await _redis.HashSetAsync(
-            cartKey,
-            item.CourseId.ToString(),
-            JsonSerializer.Serialize(item));
-
-        await _redis.KeyExpireAsync(
+        var hashTask = _redis.HashSetAsync(
         cartKey,
-        TimeSpan.FromDays(_expirationDays));
+        item.CourseId.ToString(),
+        JsonSerializer.Serialize(item));
+
+        var expireTask = _redis.KeyExpireAsync(
+            cartKey,
+            TimeSpan.FromDays(_expirationDays));
+
+        await Task.WhenAll(hashTask, expireTask);
     }
 
     public async Task CacheCartAsync(
@@ -112,5 +120,38 @@ internal sealed class CartCacheRepository : ICartCacheRepository
     public async Task RemoveCartAsync(string cartKey)
     {
         await _redis.KeyDeleteAsync(cartKey);
+    }
+
+    public async Task MarkDirtyAsync(string cartKey)
+    {
+        var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+
+        await _redis.SortedSetAddAsync(DirtyCartsKey, cartKey, timestamp);
+    }
+
+    public async Task<List<string>> PopDirtyKeysAsync(int count, int minAgeMinutes)
+    {
+        var cutoff = DateTimeOffset.UtcNow
+            .AddMinutes(-minAgeMinutes)
+            .ToUnixTimeSeconds();
+
+        var entries = await _redis.SortedSetRangeByScoreAsync(
+            DirtyCartsKey,
+            stop: cutoff,
+            take: count);
+
+        if (entries.Length == 0)
+            return [];
+
+        var keys = entries
+            .Select(e => e.ToString())
+            .ToList();
+
+        var redisValues = entries
+            .ToArray();
+
+        await _redis.SortedSetRemoveAsync(DirtyCartsKey, redisValues);
+
+        return keys;
     }
 }

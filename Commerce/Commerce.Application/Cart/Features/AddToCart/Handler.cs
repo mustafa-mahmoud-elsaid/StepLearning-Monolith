@@ -35,6 +35,9 @@ internal sealed class Handler(
                 cartItemDto,
                 cancellationToken);
 
+            if (!owner.IsGuest)
+                await cartCacheRepository.MarkDirtyAsync(owner.Key);
+
             return Result.Success();
         }
 
