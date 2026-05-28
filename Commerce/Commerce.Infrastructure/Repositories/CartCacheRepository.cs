@@ -108,4 +108,9 @@ internal sealed class CartCacheRepository : ICartCacheRepository
     {
         return await _redis.KeyExistsAsync(cartKey);
     }
+
+    public async Task RemoveCartAsync(string cartKey)
+    {
+        await _redis.KeyDeleteAsync(cartKey);
+    }
 }

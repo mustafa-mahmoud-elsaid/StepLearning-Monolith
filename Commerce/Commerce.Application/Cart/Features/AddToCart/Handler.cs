@@ -39,11 +39,11 @@ internal sealed class Handler(
         }
 
         var cart = await cartRepository
-            .GetByStudentIdAsync(request.StudentId, cancellationToken);
+            .GetByStudentIdAsync(owner.UserId!.Value, cancellationToken);
 
         var isNewCart = cart is null;
 
-        cart ??= Domain.Cart.Cart.Create(request.StudentId);
+        cart ??= Domain.Cart.Cart.Create(owner.UserId!.Value);
 
         try
         {

@@ -5,7 +5,6 @@ public class RemoveFromCartCommandValidator : AbstractValidator<RemoveFromCartCo
 {
     public RemoveFromCartCommandValidator()
     {
-        RuleFor(x => x.StudentId).NotEmpty().WithMessage("Student id must not be empty");
         RuleFor(x => x.CourseId).NotEmpty().WithMessage("Course id must not be empty");
     }
 }
