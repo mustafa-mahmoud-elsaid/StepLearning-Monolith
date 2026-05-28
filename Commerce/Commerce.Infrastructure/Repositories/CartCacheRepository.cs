@@ -129,6 +129,11 @@ internal sealed class CartCacheRepository : ICartCacheRepository
         await _redis.SortedSetAddAsync(DirtyCartsKey, cartKey, timestamp);
     }
 
+    public async Task RemoveDirtyAsync(string cartKey)
+    {
+        await _redis.SortedSetRemoveAsync(DirtyCartsKey, cartKey);
+    }
+
     public async Task<List<string>> PopDirtyKeysAsync(int count, int minAgeMinutes)
     {
         var cutoff = DateTimeOffset.UtcNow

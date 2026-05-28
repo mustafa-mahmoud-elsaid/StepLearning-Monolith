@@ -14,12 +14,9 @@ public class PaymentsController(
     IPaymentWebhookService paymentWebhookService) : ControllerBase
 {
     [HttpPost("checkout")]
-    public async Task<IActionResult> Checkout([FromBody] CheckoutRequest request, CancellationToken ct)
+    public async Task<IActionResult> Checkout(CancellationToken ct)
     {
-        if (!User.TryGetStudentId(out var studentId))
-            return Unauthorized();
-
-        var result = await mediator.Send(new CheckoutCommand(studentId, request.OrderId), ct);
+        var result = await mediator.Send(new CheckoutCommand(), ct);
 
         return result.IsSuccess
             ? Ok(new CheckoutResponse(result.Value!))
@@ -45,7 +42,5 @@ public class PaymentsController(
         };
     }
 }
-
-public record CheckoutRequest(Guid OrderId);
 
 public record CheckoutResponse(string PaymentUrl);

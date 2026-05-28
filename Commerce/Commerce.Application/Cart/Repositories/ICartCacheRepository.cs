@@ -13,5 +13,6 @@ public interface ICartCacheRepository
     Task RemoveCartAsync(string cartKey);
     Task<bool> CartExistsAsync(string cartKey);
     Task MarkDirtyAsync(string cartKey);
+    Task RemoveDirtyAsync(string cartKey);
     Task<List<string>> PopDirtyKeysAsync(int count, int minAgeMinutes);
 }
