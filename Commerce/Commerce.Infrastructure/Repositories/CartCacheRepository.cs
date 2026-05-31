@@ -122,6 +122,20 @@ internal sealed class CartCacheRepository : ICartCacheRepository
         await _redis.KeyDeleteAsync(cartKey);
     }
 
+    public async Task<bool> MigrateCartAsync(string sourceKey, string destinationKey)
+    {
+        if (!await _redis.KeyExistsAsync(sourceKey))
+            return false;
+
+        await _redis.KeyRenameAsync(sourceKey, destinationKey);
+
+        await _redis.KeyExpireAsync(
+            destinationKey,
+            TimeSpan.FromDays(_expirationDays));
+
+        return true;
+    }
+
     public async Task MarkDirtyAsync(string cartKey)
     {
         var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();

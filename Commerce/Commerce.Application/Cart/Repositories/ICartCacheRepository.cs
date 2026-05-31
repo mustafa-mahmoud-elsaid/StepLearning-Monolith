@@ -12,6 +12,7 @@ public interface ICartCacheRepository
     Task RemoveItemAsync(string cartKey, string courseId, CancellationToken cancellationToken = default);
     Task RemoveCartAsync(string cartKey);
     Task<bool> CartExistsAsync(string cartKey);
+    Task<bool> MigrateCartAsync(string sourceKey, string destinationKey);
     Task MarkDirtyAsync(string cartKey);
     Task RemoveDirtyAsync(string cartKey);
     Task<List<string>> PopDirtyKeysAsync(int count, int minAgeMinutes);

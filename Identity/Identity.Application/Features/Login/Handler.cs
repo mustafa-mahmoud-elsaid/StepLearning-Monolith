@@ -24,7 +24,7 @@ internal sealed class Handler(
 
         
 
-        return Result<LoginResponse>.Success(new(Token: jwtToken, refTokenResult.Value!));
+        return Result<LoginResponse>.Success(new(jwtToken, refTokenResult.Value!, userId));
     }
 }
 
