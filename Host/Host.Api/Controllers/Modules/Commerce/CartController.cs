@@ -10,7 +10,7 @@ namespace Host.Api.Controllers.Modules.Commerce;
 
 [ApiController]
 [Route("api/cart")]
-[Authorize(Roles = "Student")]
+//[Authorize(Roles = "Student")]
 public sealed class CartController(IMediator mediator) : ControllerBase
 {
     [HttpPost("items")]

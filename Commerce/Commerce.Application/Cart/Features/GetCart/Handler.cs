@@ -33,30 +33,25 @@ internal sealed class Handler(
 
         if (persistedCart is null)
             return EmptyCart();
+        var cartItemsDto = persistedCart.Items.Select(item =>
+            new CartItemDto(item.CourseId, item.CourseTitle, item.Price)).ToList();
 
         await cartCacheRepository.CacheCartAsync(
             owner.Key,
-            persistedCart.Items.Select(item =>
-            new CartItemDto(item.CourseId, item.CourseTitle, item.Price)).ToList(),
+            cartItemsDto,
             cancellationToken);
 
-        return CartSuccessResult(
-            persistedCart.Items.ToList());
+        return CartSuccessResult(cartItemsDto);
     }
     private static Result<CartDto> EmptyCart()
     {
         return Result<CartDto>.Success(
             new CartDto([], 0));
     }
-    private static Result<CartDto> CartSuccessResult(List<CartItem> items)
+    private static Result<CartDto> CartSuccessResult(List<CartItemDto> items)
     {
-        var itemsDto = items
-            .Select(i => 
-            new CartItemDto(i.CourseId, i.CourseTitle, i.Price))
-            .ToList();
-
         return Result<CartDto>.Success(
-            new(itemsDto,
+            new(items,
             items
             .Sum(i => i.Price)));
     }

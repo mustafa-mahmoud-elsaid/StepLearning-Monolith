@@ -5,7 +5,7 @@ namespace Commerce.Application.Cart.Repositories;
 
 public interface ICartCacheRepository
 {
-    Task<List<CartItem>?> GetAsync(string cartKey, CancellationToken cancellationToken = default);
+    Task<List<CartItemDto>?> GetAsync(string cartKey, CancellationToken cancellationToken = default);
 
     Task AddOrUpdateAsync(string cartKey,CartItemDto item, CancellationToken cancellationToken = default);
     Task CacheCartAsync(string cartKey, IReadOnlyCollection<CartItemDto> items, CancellationToken cancellationToken = default);

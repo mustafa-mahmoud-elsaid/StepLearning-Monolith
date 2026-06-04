@@ -29,6 +29,6 @@ internal sealed class CartOwnerProvider(IHttpContextAccessor httpContextAccessor
             context.Response.Cookies.Append(cookieName, guestId);
         }
 
-        return new($"cart:guest:${guestId}", false, null);
+        return new($"cart:guest:${guestId}", true, null);
     }
 }

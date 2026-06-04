@@ -43,7 +43,7 @@ internal sealed class CartCacheRepository : ICartCacheRepository
         _redis = redis.GetDatabase();
     }
 
-    public async Task<List<CartItem>?> GetAsync(string cartKey, CancellationToken cancellationToken = default)
+    public async Task<List<CartItemDto>?> GetAsync(string cartKey, CancellationToken cancellationToken = default)
     {
         var values =
             await _redis.HashValuesAsync(cartKey);
@@ -53,7 +53,7 @@ internal sealed class CartCacheRepository : ICartCacheRepository
 
         return values
             .Select(v =>
-            JsonSerializer.Deserialize<CartItem>(v.ToString())!)
+            JsonSerializer.Deserialize<CartItemDto>(v.ToString())!)
             .ToList();
 
     }
