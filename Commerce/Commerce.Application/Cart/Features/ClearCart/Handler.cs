@@ -19,14 +19,16 @@ internal sealed class Handler(
         logger.LogInformation("Owner: {ownerKey} cart has been removed from the cache",
             owner.Key);
 
+        if (!owner.IsGuest)
+        {
+            var cart = await cartRepository.GetByStudentIdAsync(owner.UserId!.Value, cancellationToken);
 
-        var cart = await cartRepository.GetByStudentIdAsync(owner.UserId!.Value, cancellationToken);
+            if (cart is null)
+                return Result.Success();
 
-        if (cart is null)
-            return Result.Success();
-
-        cart.Clear();
-        await cartRepository.SaveChangesAsync(cancellationToken);
+            cart.Clear();
+            await cartRepository.SaveChangesAsync(cancellationToken);
+        }
 
         return Result.Success();
     }
