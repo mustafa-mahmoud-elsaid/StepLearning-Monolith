@@ -1,9 +1,11 @@
 ﻿using Courses.Application.RepositoriesContracts;
+using Microsoft.Extensions.Caching.Distributed;
 using StepLearning.Shared.Abstraction;
+using System.Text.Json;
 
 namespace Courses.Infrastructure.Services;
 
-internal class CourseService(ICoursesRepository coursesRepository) : ICourseService
+internal class CourseService(ICoursesRepository coursesRepository, IDistributedCache cache) : ICourseService
 {
     public async Task<bool> Exists(Guid courseId, CancellationToken ct = default)
     {
@@ -26,6 +28,30 @@ internal class CourseService(ICoursesRepository coursesRepository) : ICourseServ
         if (courseId == Guid.Empty)
             return null;
 
-        return await coursesRepository.GetCourseSnapshotAsync(courseId, ct);
+        var key = $"course.snapshot.{courseId}";
+
+        var cachedResult = await cache.GetStringAsync(key, ct);
+
+        if (!string.IsNullOrEmpty(cachedResult))
+            return JsonSerializer.Deserialize<CourseSnapshot>(cachedResult);
+
+        var courseSnapshot = await coursesRepository.GetCourseSnapshotAsync(courseId, ct);
+
+        if (courseSnapshot is null)
+            return null;
+
+        var options = new DistributedCacheEntryOptions
+        {
+            AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(2)
+        };
+
+        await cache.SetStringAsync(
+            key,
+            JsonSerializer.Serialize(courseSnapshot),
+            options,
+            ct);
+
+        return courseSnapshot;
+
     }
 }

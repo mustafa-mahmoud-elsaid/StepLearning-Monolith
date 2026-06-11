@@ -1,4 +1,5 @@
 using Commerce.Application.Cart.Repositories;
+using Commerce.Application.Cart.ServicesInterfaces;
 using Commerce.Application.Orders.Repositories;
 using Commerce.Application.Payment.Repositories;
 using Commerce.Application.Payment.ServicesInterfaces;
@@ -8,6 +9,8 @@ using Commerce.Infrastructure.Repositories;
 using Commerce.Infrastructure.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using StackExchange.Redis;
+using StepLearning.Shared.Abstraction;
 using Stripe;
 
 namespace Commerce.Infrastructure;
@@ -31,6 +34,23 @@ public static class DependencyInjection
         StripeConfiguration.ApiKey = configuration["Stripe:SecretKey"];
         services.AddScoped<IPaymentService, StripePaymentService>();
         services.AddScoped<IPaymentWebhookService, StripePaymentWebhookService>();
+
+        services.AddHttpContextAccessor();
+
+        services.AddScoped<ICartOwnerProvider, CartOwnerProvider>();
+        services.AddScoped<ICartCacheRepository, CartCacheRepository>();
+        services.AddScoped<ICartMigrationService, CartMigrationService>();
+
+        var redisConnection = configuration
+            .GetConnectionString("Redis");
+
+        services.AddStackExchangeRedisCache(options =>
+        {
+            options.Configuration = redisConnection;
+        });
+
+        services.AddSingleton<IConnectionMultiplexer>(
+            ConnectionMultiplexer.Connect(redisConnection!));
 
         return services;
     }

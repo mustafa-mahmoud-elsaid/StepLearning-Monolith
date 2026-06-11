@@ -1,3 +1,4 @@
+using Commerce.Application.Cart.Repositories;
 using Commerce.Application.Orders.Repositories;
 using Commerce.Application.Payment.Repositories;
 using Commerce.Application.Payment.ServicesInterfaces;
@@ -15,6 +16,8 @@ internal sealed class StripePaymentWebhookService(
     IOptions<StripeOptions> stripeOptions,
     IPaymentRepository paymentRepository,
     IOrderRepository orderRepository,
+    ICartRepository cartRepository,
+    ICartCacheRepository cartCacheRepository,
     IIntegrationEventPublisher integrationEventPublisher,
     ILogger<StripePaymentWebhookService> logger) : IPaymentWebhookService
 {
@@ -90,6 +93,23 @@ internal sealed class StripePaymentWebhookService(
             await integrationEventPublisher.PublishAsync(
                 new PaymentSucceededEvent(payment.StudentId, payment.Id, courseIds),
                 cancellationToken);
+
+            // Clear the student's cart after successful payment
+            var cartKey = $"cart:user:{payment.StudentId}";
+            await cartCacheRepository.RemoveCartAsync(cartKey);
+            await cartCacheRepository.RemoveDirtyAsync(cartKey);
+
+            var cart = await cartRepository.GetByStudentIdAsync(payment.StudentId, cancellationToken);
+            if (cart is not null)
+            {
+                cart.Clear();
+                await cartRepository.SaveChangesAsync(cancellationToken);
+            }
+
+            logger.LogInformation(
+                "Cart cleared for student {StudentId} after successful payment {PaymentId}",
+                payment.StudentId,
+                payment.Id);
         }
         else
         {

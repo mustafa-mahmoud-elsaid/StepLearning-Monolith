@@ -22,6 +22,12 @@ public static class DependencyInjection
         services.AddScoped<ICoursesRepository, CoursesRepository>();
         services.AddScoped<ISectionsRepository, SectionsRepository>();
         services.AddScoped<ICourseService, CourseService>();
+
+        services.AddStackExchangeRedisCache(options =>
+        {
+            options.Configuration =
+                configuration.GetConnectionString("Redis");
+        });
         return services;
     }
 }

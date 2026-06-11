@@ -7,6 +7,7 @@ using Identity.Application.Features.Register.Student;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using StepLearning.Shared.Abstraction;
 
 namespace Host.Api.Controllers.Modules.Identity;
 
@@ -15,17 +16,35 @@ namespace Host.Api.Controllers.Modules.Identity;
 public class AuthController : ControllerBase
 {
     private readonly IMediator _mediator;
+    private readonly ICartMigrationService _cartMigrationService;
 
-    public AuthController(IMediator mediator)
+    public AuthController(IMediator mediator, ICartMigrationService cartMigrationService)
     {
         _mediator = mediator;
+        _cartMigrationService = cartMigrationService;
     }
 
     [HttpPost("register/student")]
     public async Task<IActionResult> RegisterStudent([FromBody] StudentRegisterDto dto, CancellationToken ct)
     {
         var result = await _mediator.Send(new StudentRegisterCommand(dto), ct);
-        return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
+
+        if (!result.IsSuccess)
+            return BadRequest(result.Error);
+
+        // Migrate guest cart if the cookie exists
+        const string cookieName = "guest-cart-id";
+        if (Request.Cookies.TryGetValue(cookieName, out var guestId) && !string.IsNullOrWhiteSpace(guestId))
+        {
+            var guestCartKey = $"cart:guest:${guestId}";
+            var userId = result.Value!.UserId;
+
+            await _cartMigrationService.MigrateGuestCartAsync(guestCartKey, userId, ct);
+
+            Response.Cookies.Delete(cookieName);
+        }
+
+        return Ok(result.Value);
     }
 
     [HttpPost("register/instructor")]

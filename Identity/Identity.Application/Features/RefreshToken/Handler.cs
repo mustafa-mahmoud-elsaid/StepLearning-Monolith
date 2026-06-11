@@ -42,7 +42,7 @@ internal sealed class Handler(
         // 6. Persist the revocation + new token in one save
         await refreshTokenRepository.SaveChangesAsync(cancellationToken);
 
-        return Result<LoginResponse>.Success(new(newJwtToken, newRefreshTokenResult.Value!));
+        return Result<LoginResponse>.Success(new(newJwtToken, newRefreshTokenResult.Value!, userId));
     }
 }
 

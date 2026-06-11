@@ -21,7 +21,7 @@ internal sealed class UserRegistrationService(
         if (!refTokenResult.IsSuccess)
             return Result<LoginResponse>.Failure(refTokenResult.Error!);
 
-        return Result<LoginResponse>.Success(new LoginResponse(jwtToken, refTokenResult.Value!));
+        return Result<LoginResponse>.Success(new LoginResponse(jwtToken, refTokenResult.Value!, userId));
     }
 
 }

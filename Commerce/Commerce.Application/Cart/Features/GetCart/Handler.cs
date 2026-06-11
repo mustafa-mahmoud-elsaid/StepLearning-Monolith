@@ -1,24 +1,58 @@
 using Commerce.Application.Cart.DTO;
 using Commerce.Application.Cart.Repositories;
+using Commerce.Application.Cart.ServicesInterfaces;
+using Commerce.Domain.Cart;
 
 namespace Commerce.Application.Cart.Features.GetCart;
 
-internal sealed class Handler(ICartRepository cartRepository) : IRequestHandler<GetCartQuery, Result<CartDto>>
+internal sealed class Handler(
+    ICartRepository cartRepository,
+    ICartCacheRepository cartCacheRepository,
+    ICartOwnerProvider cartOwnerProvider)
+    : IRequestHandler<GetCartQuery, Result<CartDto>>
 {
     public async Task<Result<CartDto>> Handle(GetCartQuery request, CancellationToken cancellationToken)
     {
-        var cart = await cartRepository.GetByStudentIdAsync(request.StudentId, cancellationToken);
+        var owner = cartOwnerProvider.GetOwner();
 
-        if (cart is null)
-            return Result<CartDto>.Success(new CartDto(request.StudentId, [], 0));
+        var cachedCart =
+            await cartCacheRepository.GetAsync(
+                owner.Key,
+                cancellationToken);
 
-        var items = cart.Items
-            .Select(item => new CartItemDto(item.CourseId, item.CourseTitle, item.Price))
-            .ToList();
+        if (cachedCart is not null)
+            return CartSuccessResult(cachedCart);
 
-        return Result<CartDto>.Success(new CartDto(
-            cart.StudentId,
-            items,
-            items.Sum(item => item.Price)));
+        if (owner.IsGuest)
+            return EmptyCart();
+
+        var persistedCart =
+            await cartRepository.GetByStudentIdAsync(
+                owner.UserId!.Value,
+                cancellationToken);
+
+        if (persistedCart is null)
+            return EmptyCart();
+        var cartItemsDto = persistedCart.Items.Select(item =>
+            new CartItemDto(item.CourseId, item.CourseTitle, item.Price)).ToList();
+
+        await cartCacheRepository.CacheCartAsync(
+            owner.Key,
+            cartItemsDto,
+            cancellationToken);
+
+        return CartSuccessResult(cartItemsDto);
+    }
+    private static Result<CartDto> EmptyCart()
+    {
+        return Result<CartDto>.Success(
+            new CartDto([], 0));
+    }
+    private static Result<CartDto> CartSuccessResult(List<CartItemDto> items)
+    {
+        return Result<CartDto>.Success(
+            new(items,
+            items
+            .Sum(i => i.Price)));
     }
 }
