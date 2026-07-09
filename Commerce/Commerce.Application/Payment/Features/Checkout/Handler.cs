@@ -1,9 +1,9 @@
 using Commerce.Application.Cart.Repositories;
 using Commerce.Application.Cart.ServicesInterfaces;
+using Commerce.Application.Orders.Features.CreateOrder;
 using Commerce.Application.Orders.Repositories;
 using Commerce.Application.Payment.Repositories;
 using Commerce.Application.Payment.ServicesInterfaces;
-using Commerce.Domain.Orders;
 using Commerce.Domain.Payment;
 
 namespace Commerce.Application.Payment.Features.Checkout;
@@ -14,47 +14,54 @@ internal sealed class Handler(
     IOrderRepository orderRepository,
     IPaymentRepository paymentRepository,
     IPaymentService paymentService,
-    ICartOwnerProvider ownerProvider) : IRequestHandler<CheckoutCommand, Result<string>>
+    ICartOwnerProvider ownerProvider,
+    ISender sender) : IRequestHandler<CheckoutCommand, Result<string>>
 {
     public async Task<Result<string>> Handle(CheckoutCommand request, CancellationToken cancellationToken)
     {
         var owner = ownerProvider.GetOwner();
         var studentId = owner.UserId!.Value;
 
-        // 1. Read cart – cache first, fall back to DB
+        // 1. Sync cache → DB so CreateOrderCommand sees the latest items
         var cachedItems = await cartCacheRepository.GetAsync(owner.Key, cancellationToken);
-
-        List<OrderItem> orderItems;
 
         if (cachedItems is not null && cachedItems.Count > 0)
         {
-            orderItems = cachedItems
-                .Select(item => OrderItem.Create(Guid.Empty, item.CourseId, item.CourseTitle, item.Price))
-                .ToList();
-        }
-        else
-        {
             var cart = await cartRepository.GetByStudentIdAsync(studentId, cancellationToken);
+            var isNewCart = cart is null;
 
-            if (cart is null || !cart.Items.Any())
-                return Result<string>.Failure("Cart is empty");
+            cart ??= Domain.Cart.Cart.Create(studentId);
+            cart.Clear();
 
-            orderItems = cart.Items
-                .Select(item => OrderItem.Create(Guid.Empty, item.CourseId, item.CourseTitle, item.Price))
-                .ToList();
+            foreach (var item in cachedItems)
+            {
+                cart.AddItem(item.CourseId, item.Price, item.CourseTitle);
+            }
+
+            if (isNewCart)
+                await cartRepository.AddAsync(cart, cancellationToken);
+
+            await cartRepository.SaveChangesAsync(cancellationToken);
         }
 
-        // 2. Create order from cart items
-        var order = Order.Create(studentId, orderItems);
-        await orderRepository.AddAsync(order, cancellationToken);
+        // 2. Create order from cart (also clears the DB cart)
+        var orderResult = await sender.Send(new CreateOrderCommand(studentId), cancellationToken);
 
-        // 3. Create payment record + Stripe session
+        if (!orderResult.IsSuccess)
+            return Result<string>.Failure(orderResult.Error!);
+
+        // 3. Clear the cache cart
+        await cartCacheRepository.RemoveCartAsync(owner.Key);
+
+        // 4. Create payment record + Stripe session
+        var order = await orderRepository.GetByIdAsync(orderResult.Value, cancellationToken);
+
         PaymentRecord payment;
         string paymentUrl;
 
         try
         {
-            payment = PaymentRecord.CreateCheckout(studentId, order.Id, order.TotalAmount);
+            payment = PaymentRecord.CreateCheckout(studentId, order!.Id, order.TotalAmount);
             paymentUrl = await paymentService.CreatePaymentUrl(payment.Id, studentId, order);
         }
         catch (InvalidOperationException ex)
